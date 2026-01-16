@@ -34,7 +34,7 @@ procedure TSysToolsFrm.Button1Click(Sender: TObject);
 begin
   ctlResultMemo.Text :=
   qryX2IrisQuery.DoClassMethod('X2IrisClient.RESTServer', 'RunScript',
-    [MainForm.Namespace, NormalizeScript(ctlSource.Text)]);
+    [MainForm.ClassExplorer.Namespace, NormalizeScript(ctlSource.Text)]);
 end;
 
 

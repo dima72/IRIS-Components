@@ -41,11 +41,12 @@ uses main;
 
 procedure TfrmLogin.btnOKClick(Sender: TObject);
 begin
-  with MainForm, MainForm.BaseAuthenticator, MainForm.qryX2IrisQuery do begin
+  with MainForm, BaseAuthenticator, ClassExplorer.qryX2IrisQuery do begin
     Username := Trim(edUsername.Text);
     Password := Trim(edPassword.Text);
     Namespace := Trim(lcNamespaces.Items.Strings[lcNamespaces.ItemIndex]);
-    InitDBTree;
+    RestClient := MainForm.RESTClient;
+    ClassExplorer.InitDBTree;
     with FIniFile do begin
       if chkRememberParams.Checked then begin
         WriteString('Login', 'Namespace', Namespace);
@@ -71,6 +72,8 @@ begin
   var IniFile := IncludeTrailingPathDelimiter(IniDirectory) + ININAME;
   FIniFile := TIniFile.Create(IniFile);
   with FIniFile do begin
+    MainForm.RESTClient.BaseURL := ReadString('Database', 'IrisURL',
+      DEFAULTURL);
     chkRememberParams.Checked := ReadBool('Login', 'RememberParams', True);
     edUsername.Text := ReadString('Login', 'UserName', DEFAULTUSER);
     edPassword.Text := ReadString('Login', 'Password', '');

@@ -1,7 +1,7 @@
 object MainForm: TMainForm
   Left = 0
   Top = 0
-  ClientHeight = 654
+  ClientHeight = 634
   ClientWidth = 985
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -9,19 +9,11 @@ object MainForm: TMainForm
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
+  Menu = MainMenu1
   Position = poDesktopCenter
   OnCreate = FormCreate
   OnShow = FormShow
   TextHeight = 15
-  object spltDBtree: TSplitter
-    Left = 257
-    Top = 26
-    Width = 6
-    Height = 609
-    Cursor = crSizeWE
-    ResizeStyle = rsUpdate
-    ExplicitLeft = 218
-  end
   object ControlBarMain: TControlBar
     Left = 0
     Top = 0
@@ -36,7 +28,7 @@ object MainForm: TMainForm
     ShowHint = True
     TabOrder = 0
     object ToolBarMainButtons: TToolBar
-      Left = 11
+      Left = 264
       Top = 2
       Width = 98
       Height = 22
@@ -76,7 +68,7 @@ object MainForm: TMainForm
       end
     end
     object ToolBarDonate: TToolBar
-      Left = 125
+      Left = 375
       Top = 2
       Width = 65
       Height = 22
@@ -101,87 +93,17 @@ object MainForm: TMainForm
         ImageIndex = 185
       end
     end
-  end
-  object pnlLeft: TPanel
-    Left = 0
-    Top = 26
-    Width = 257
-    Height = 609
-    Align = alLeft
-    BevelOuter = bvNone
-    TabOrder = 1
-    object ToolBarTree: TToolBar
-      Left = 0
-      Top = 0
-      Width = 257
+    object DBNavigator1: TDBNavigator
+      Left = 11
+      Top = 2
+      Width = 240
       Height = 22
-      ButtonWidth = 137
-      Caption = 'ToolBarTree'
-      Images = VirtualImageListMain
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 0
-      Wrapable = False
-      object DBNavigator1: TDBNavigator
-        Left = 0
-        Top = 0
-        Width = 240
-        Height = 22
-        DataSource = dsrMain
-        TabOrder = 0
-      end
-    end
-    object DBtree: TVirtualStringTree
-      Left = 0
-      Top = 22
-      Width = 257
-      Height = 587
-      Align = alClient
-      Constraints.MinWidth = 40
-      DefaultNodeHeight = 19
-      DragMode = dmAutomatic
-      DragType = dtVCL
-      Header.AutoSizeIndex = 0
-      Header.Options = [hoAutoResize, hoColumnResize, hoDrag]
-      HintMode = hmTooltip
-      HotCursor = crHandPoint
-      Images = VirtualImageListMain
-      IncrementalSearch = isInitializedOnly
-      Indent = 12
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 1
-      TreeOptions.PaintOptions = [toHotTrack, toShowButtons, toShowDropmark, toShowRoot, toShowTreeLines, toThemeAware, toUseBlendedImages, toGhostedIfUnfocused, toUseExplorerTheme]
-      TreeOptions.SelectionOptions = [toFullRowSelect, toRightClickSelect]
-      OnCompareNodes = DBtreeCompareNodes
-      OnFocusChanged = DBtreeFocusChanged
-      OnFreeNode = DBtreeFreeNode
-      OnGetText = DBtreeGetText
-      OnGetNodeDataSize = DBtreeGetNodeDataSize
-      OnInitChildren = DBtreeInitChildren
-      OnNodeClick = DBtreeNodeClick
-      Touch.InteractiveGestures = [igPan, igPressAndTap]
-      Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
-      Columns = <
-        item
-          Position = 0
-          Text = 'Name'
-          Width = 253
-        end
-        item
-          Alignment = taRightJustify
-          MinWidth = 0
-          Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coAllowFocus]
-          Position = 1
-          Text = 'Size'
-          Width = 55
-        end>
-      DefaultText = ''
+      TabOrder = 2
     end
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 635
+    Top = 615
     Width = 985
     Height = 19
     AutoHint = True
@@ -214,21 +136,36 @@ object MainForm: TMainForm
     ParentFont = True
     UseSystemFont = False
   end
-  object pnlRight: TPanel
-    Left = 263
+  inline ClassExplorer: TClassExplorerFrame
+    Left = 0
     Top = 26
-    Width = 722
-    Height = 609
+    Width = 985
+    Height = 589
     Align = alClient
-    BevelOuter = bvNone
-    TabOrder = 3
-    object pnlMain: TPanel
-      Left = 0
-      Top = 0
-      Width = 722
-      Height = 609
-      Align = alClient
-      TabOrder = 0
+    TabOrder = 2
+    ExplicitTop = 26
+    ExplicitWidth = 985
+    ExplicitHeight = 589
+    inherited spltDBtree: TSplitter
+      Height = 589
+      ExplicitHeight = 589
+    end
+    inherited pnlLeft: TPanel
+      Height = 589
+      StyleElements = [seFont, seClient, seBorder]
+      ExplicitHeight = 589
+      inherited DBtree: TVirtualStringTree
+        Height = 589
+        ExplicitHeight = 589
+        DefaultText = ''
+      end
+    end
+    inherited pnlRight: TPanel
+      Width = 730
+      Height = 589
+      StyleElements = [seFont, seClient, seBorder]
+      ExplicitWidth = 730
+      ExplicitHeight = 589
     end
   end
   object VirtualImageListMain: TVirtualImageList
@@ -1271,13 +1208,8 @@ object MainForm: TMainForm
       end>
     ImageCollection = ImageCollectionIcons8
     ImageNameAvailable = False
-    Left = 201
-    Top = 75
-  end
-  object VirtualImageList1: TVirtualImageList
-    Images = <>
-    Left = 96
-    Top = 72
+    Left = 121
+    Top = 43
   end
   object ImageCollectionIcons8: TImageCollection
     Images = <
@@ -14377,29 +14309,10 @@ object MainForm: TMainForm
     Left = 201
     Top = 147
   end
-  object qryX2IrisQuery: TX2IrisQuery
-    RestClient = RESTClient
-    Active = False
-    SQL.Strings = (
-      'SELECT * FROM %Dictionary.ClassDefinition')
-    Left = 94
-    Top = 142
-  end
-  object RESTClient: TRESTClient
-    Authenticator = BaseAuthenticator
-    Accept = 'application/json, text/plain; q=0.9, text/html;q=0.8,'
-    AcceptCharset = 'utf-8, *;q=0.8'
-    BaseURL = 'http://localhost:52773/csp/clientapp'
-    ContentType = 'application/json'
-    Params = <>
-    SynchronizedEvents = False
-    Left = 24
-    Top = 74
-  end
   object ActionList1: TActionList
     Images = VirtualImageListMain
-    Left = 22
-    Top = 142
+    Left = 142
+    Top = 246
     object acRefresh: TAction
       Caption = 'Refresh'
       Hint = 'Refresh'
@@ -14418,16 +14331,11 @@ object MainForm: TMainForm
       ImageIndex = 115
       OnExecute = acDesignerExecute
     end
-  end
-  object BaseAuthenticator: THTTPBasicAuthenticator
-    Username = 'restuser'
-    Password = 'AS2EvXx32i.x.99'
-    Left = 56
-    Top = 218
-  end
-  object dsrMain: TDataSource
-    Left = 184
-    Top = 218
+    object acFormsBinding: TAction
+      Caption = 'Forms Binding'
+      ImageIndex = 19
+      OnExecute = acFormsBindingExecute
+    end
   end
   object cmp_IDEScripter: TIDEScripter
     DefaultLanguage = slPascal
@@ -14473,5 +14381,54 @@ object MainForm: TMainForm
     CallExecHookEvent = False
     Left = 48
     Top = 424
+  end
+  object MainMenu1: TMainMenu
+    AutoHotkeys = maManual
+    Images = VirtualImageListMain
+    Left = 304
+    Top = 80
+    object MainMenuFile: TMenuItem
+      Caption = 'File'
+      Hint = 'File related commands'
+      object N5: TMenuItem
+        Caption = '-'
+      end
+    end
+    object MainMenuEdit: TMenuItem
+      Caption = 'Edit'
+      Hint = 'Edit commands'
+    end
+    object MainMenuTools: TMenuItem
+      Caption = 'Tools'
+      object MenuUserManager: TMenuItem
+        Action = acDesigner
+      end
+      object menuMaintenance: TMenuItem
+        Action = acFormsBinding
+      end
+    end
+    object MainMenuGoto: TMenuItem
+      Caption = 'Go to'
+    end
+    object MainMenuHelp: TMenuItem
+      Caption = 'Help'
+      Hint = 'Help topics'
+    end
+  end
+  object RESTClient: TRESTClient
+    Authenticator = BaseAuthenticator
+    Accept = 'application/json, text/plain; q=0.9, text/html;q=0.8,'
+    AcceptCharset = 'utf-8, *;q=0.8'
+    ContentType = 'application/json'
+    Params = <>
+    SynchronizedEvents = False
+    Left = 504
+    Top = 186
+  end
+  object BaseAuthenticator: THTTPBasicAuthenticator
+    Username = 'restuser'
+    Password = 'AS2EvXx32i.x.99'
+    Left = 504
+    Top = 250
   end
 end

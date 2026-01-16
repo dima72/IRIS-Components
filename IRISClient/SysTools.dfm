@@ -42,7 +42,6 @@ object SysToolsFrm: TSysToolsFrm
     OnClick = Button1Click
   end
   object qryX2IrisQuery: TX2IrisQuery
-    RestClient = MainForm.RESTClient
     Active = False
     SQL.Strings = (
       'SELECT * FROM %Dictionary.ClassDefinition')

@@ -129,7 +129,6 @@
         <DCCReference Include="main.pas">
             <Form>MainForm</Form>
         </DCCReference>
-        <DCCReference Include="SynIRISSyn.pas"/>
         <DCCReference Include="loginform.pas">
             <Form>frmLogin</Form>
         </DCCReference>
@@ -145,6 +144,15 @@
         </DCCReference>
         <DCCReference Include="IDERegDBPalette.pas"/>
         <DCCReference Include="ap_X2IrisQuery.pas"/>
+        <DCCReference Include="ClassExplorerFrme.pas">
+            <Form>ClassExplorerFrame</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="FormsBindingForm.pas">
+            <Form>FormsBindingFrm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

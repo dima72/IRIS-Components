@@ -13,22 +13,14 @@ uses System.SysUtils, Winapi.Windows, Winapi.Messages, FireDAC.Stan.Intf,
   Vcl.Grids, Vcl.DBGrids, Vcl.Buttons, Vcl.ExtCtrls, Vcl.ToolWin,
   VirtualTrees.BaseAncestorVCL, VirtualTrees.BaseTree, VirtualTrees.AncestorVCL,
   VirtualTrees, VCL.Dialogs, System.Generics.Collections, Data.DB,
-  Vcl.Graphics, SynEdit, System.JSON, REST.Authenticator.Basic, loginform,
-  Vcl.DBCtrls, atPascal, FormScript, IDEMain, atScript, atScripter, PropertyList;
+  Vcl.Graphics, SynEdit, System.JSON, REST.Authenticator.Basic,
+  Vcl.DBCtrls, atPascal, FormScript, IDEMain, atScript, atScripter, PropertyList,
+  Vcl.ScriptForm, ClassExplorerFrme, Vcl.Menus;
 
 
 const
    WM_SHOWLOGIN = WM_USER + 1;
 type
-   PNodeData = ^TNodeData;
-   TNodeData = record
-     Key: string;
-     Caption: string;
-     ClassName: string;
-     NodeType: string;
-     isPersistent: Boolean;
-   end;
-   TListNodeType = (lntNone, lntDb, lntGroup, lntTable, lntView, lntFunction, lntProcedure, lntTrigger, lntEvent, lntColumn);
    TIDECloseAction = (icaCloseAll, icaNothing);
 
    TMyIDEEngine = class(TIDEEngine)
@@ -39,7 +31,6 @@ type
      procedure PrepareSaveProjectDialog(ADlg: TOpenDialog); override;
      procedure PrepareOpenDialog(ADlg: TOpenDialog); override;
      procedure PrepareOpenProjectDialog(ADlg: TOpenDialog); override;
-
    end;
 
   TMainForm = class(TForm)
@@ -52,47 +43,35 @@ type
     tlbSep1: TToolButton;
     ToolBarDonate: TToolBar;
     btnDonate: TToolButton;
-    pnlLeft: TPanel;
-    ToolBarTree: TToolBar;
     StatusBar: TStatusBar;
-    spltDBtree: TSplitter;
-    pnlRight: TPanel;
-    qryX2IrisQuery: TX2IrisQuery;
-    RESTClient: TRESTClient;
     ActionList1: TActionList;
     acRefresh: TAction;
-    DBtree: TVirtualStringTree;
-    VirtualImageList1: TVirtualImageList;
-    BaseAuthenticator: THTTPBasicAuthenticator;
     acSysTools: TAction;
-    DBNavigator1: TDBNavigator;
-    dsrMain: TDataSource;
-    pnlMain: TPanel;
     acDesigner: TAction;
     ToolButton1: TToolButton;
     cmp_IDEScripter: TIDEScripter;
     cmp_atPascalFormScripter: TatPascalFormScripter;
+    DBNavigator1: TDBNavigator;
+    ClassExplorer: TClassExplorerFrame;
+    MainMenu1: TMainMenu;
+    MainMenuFile: TMenuItem;
+    N5: TMenuItem;
+    MainMenuEdit: TMenuItem;
+    MainMenuTools: TMenuItem;
+    MenuUserManager: TMenuItem;
+    menuMaintenance: TMenuItem;
+    MainMenuGoto: TMenuItem;
+    MainMenuHelp: TMenuItem;
+    acFormsBinding: TAction;
+    RESTClient: TRESTClient;
+    BaseAuthenticator: THTTPBasicAuthenticator;
     procedure acRefreshExecute(Sender: TObject);
-    procedure DBtreeGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
-      Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
-    procedure DBtreeGetNodeDataSize(Sender: TBaseVirtualTree;
-      var NodeDataSize: Integer);
-    procedure DBtreeInitChildren(Sender: TBaseVirtualTree; Node: PVirtualNode;
-      var ChildCount: Cardinal);
-    procedure DBtreeFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
-    procedure ctlNamespacesChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure DBtreeFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode;
-      Column: TColumnIndex);
-    procedure DBtreeNodeClick(Sender: TBaseVirtualTree;
-      const HitInfo: THitInfo);
-    procedure DBtreeCompareNodes(Sender: TBaseVirtualTree; Node1,
-      Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
     procedure acSysToolsExecute(Sender: TObject);
     procedure acDesignerExecute(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure acFormsBindingExecute(Sender: TObject);
   private
-    FClasses: TStringList;
     FCloseAction: TIDECloseAction;
     FDesignerTitle: string;
     FIDEEngine: TMyIDEEngine;
@@ -100,12 +79,8 @@ type
     procedure DesignerFormClose(Sender: TObject; var Action: TCloseAction);
     procedure IDEInspectorFilter(Sender: TObject; Prop: TProperty; var Result: Boolean);
     procedure WMShowLogin(var Msg: TMessage); message WM_SHOWLOGIN;
-    function GetNamespace: string;
-    procedure SetNamespace(const Value: string);
     { Private declarations }
   public
-    procedure InitDBTree;
-    property  Namespace: string read GetNamespace write SetNamespace;
     { Public declarations }
   end;
 
@@ -116,25 +91,16 @@ var
 const
   APPNAME = 'Iris Client';
   DEFAULTNAMESPACE = 'CLIENTAPP';
+  DEFAULTURL = 'http://localhost:52773/csp/clientapp';
   DEFAULTUSER = 'restuser';
   ININAME = 'IrisCLient.ini';
-  RSScriptGetClassesNodes =
-  'Set list="" '+
-  'Do ##class(%SYSTEM.OBJ).GetClassList(.list) '+
-  'Set class="" '+
-  'For { '+
-  '  Set class=$Order(list(class)) '+
-  '  Quit:class="" '+
-  '  Set isPersistent = $classmethod(class, "%Extends", "%Persistent") '+
-  '  if isPersistent {Write class,";","P",!} else {Write class,!} '+
-  '}';
   ScriptProjectFN = 'Project1.ssproj';
 
 implementation
 
 {$R *.dfm}
 
-uses SysTools, fIDEEditor, IDERegDBPalette;
+uses loginform, SysTools, fIDEEditor, IDERegDBPalette, FormsBindingForm;
 
 
 procedure EnsureDir(const APath: string);
@@ -150,7 +116,7 @@ var
   Proxy: TRestClient;
 begin
   IsModal := False;
-  RegisterDefaultRestClientAndNamespace(RestClient, Namespace);
+  RegisterDefaultRestClientAndNamespace(RestClient, ClassExplorer.Namespace);
   IDEEditorForm := TIDEEditorForm.Create(Application, ShowInTaskBar);
   try
     IDEEditorForm.Width := Width;
@@ -204,42 +170,21 @@ begin
   end;
 end;
 
-procedure TMainForm.acRefreshExecute(Sender: TObject);
+procedure TMainForm.acFormsBindingExecute(Sender: TObject);
 begin
-  InitDBTree;
-end;
-
-procedure TMainForm.InitDBTree;
-var
-  RootNode: PVirtualNode;
-  NodeData: PNodeData;
-begin
-  DBtree.BeginUpdate;
-  try
-    DBtree.Clear;
-    RootNode := DBtree.AddChild(nil);
-    NodeData := DBtree.GetNodeData(RootNode);
-    NodeData^.Caption := 'Classes';
-    NodeData^.NodeType := 'Root';
-    NodeData^.Key := '';
-    DBtree.HasChildren[RootNode] := True;
-    FClasses.Text := qryX2IrisQuery.DoClassMethod('X2IrisClient.RESTServer',
-    'RunScript', [Namespace, RSScriptGetClassesNodes]);
-  finally
-    DBtree.EndUpdate;
+  with TFormsBindingFrm.Create(nil) do begin
+    Classexplorer.qryX2IrisQuery.RestClient := RestClient;
+    Classexplorer.Namespace := Self.Classexplorer.Namespace;
+    Classexplorer.InitDBTree;
+    ShowModal;
+    Free;
   end;
 end;
 
-procedure TMainForm.SetNamespace(const Value: string);
+procedure TMainForm.acRefreshExecute(Sender: TObject);
 begin
-  qryX2IrisQuery.Namespace := Value;
+  ClassExplorer.InitDBTree;
 end;
-
-function TMainForm.GetNamespace: string;
-begin
-  Result := qryX2IrisQuery.Namespace;
-end;
-
 
 {
 procedure TMainForm.LoadClassData;
@@ -269,158 +214,6 @@ begin
   end;
 end;
 
-procedure TMainForm.ctlNamespacesChange(Sender: TObject);
-begin
-  InitDBTree;
-end;
-
-procedure TMainForm.DBtreeCompareNodes(Sender: TBaseVirtualTree; Node1,
-  Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
-var
-  NodeData1, NodeData2: PNodeData;
-begin
-  if not Assigned(Node1) then Exit;
-  if not Assigned(Node2) then Exit;
-  NodeData1 := Sender.GetNodeData(Node1);
-  NodeData2 := Sender.GetNodeData(Node2);
-  if NodeData1.NodeType = NodeData2.NodeType then
-    Result := CompareText(NodeData1^.Caption, NodeData2^.Caption)
-  else if NodeData1.NodeType = 'Package' then
-    Result := -1
-  else
-    Result := 1;
-end;
-
-procedure TMainForm.DBtreeFocusChanged(Sender: TBaseVirtualTree;
-  Node: PVirtualNode; Column: TColumnIndex);
-var
-  NodeData: PNodeData;
-begin
-  if not Assigned(Node) then Exit;
-  NodeData := Sender.GetNodeData(Node);
-  if Assigned(NodeData) then begin
-    if NodeData^.NodeType = 'Class' then begin
-        //qryX2IrisQuery.DoClassMethod('X2IrisClient.RESTServer', 'GetClassText',
-        //  [CurrentNamespace, NodeData^.Key]);
-    end
-    else if NodeData^.NodeType = 'Package' then begin
-      Sender.Expanded[Node] := False;
-    end;
-  end;
-end;
-
-
-procedure TMainForm.DBtreeFreeNode(Sender: TBaseVirtualTree;
-  Node: PVirtualNode);
-var
-  NodeData: PNodeData;
-begin
-  NodeData := Sender.GetNodeData(Node);
-  Finalize(NodeData^);
-end;
-
-procedure TMainForm.DBtreeGetNodeDataSize(Sender: TBaseVirtualTree;
-  var NodeDataSize: Integer);
-begin
-  NodeDataSize := SizeOf(TNodeData);
-end;
-
-procedure TMainForm.DBtreeGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
-  Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
-var
-  NodeData: PNodeData;
-begin
-  NodeData := Sender.GetNodeData(Node);
-  if Assigned(NodeData) then
-    CellText := NodeData^.Caption;
-end;
-
-procedure TMainForm.DBtreeInitChildren(Sender: TBaseVirtualTree;
-  Node: PVirtualNode; var ChildCount: Cardinal);
-var
-  Child: PVirtualNode;
-  NodeData, ChildData: PNodeData;
-  I: Integer;
-  sRow, sPackage, sClass, sKey: string;
-  Unique: TStringList;
-begin
-  Unique := nil;
-  DBtree.BeginUpdate;
-  try
-    Unique := TStringList.Create;
-    Unique.Sorted := True;
-    Unique.Duplicates := dupIgnore;
-    NodeData := DBtree.GetNodeData(Node);
-    if NodeData^.NodeType = 'Root' then begin
-      // Extract first segment before dot
-      for I := 0 to FClasses.Count - 1 do
-      begin
-        sRow := FClasses[I];
-        sPackage := Fetch(sRow, '.');  // returns text before first dot
-        if Unique.IndexOf(sPackage) = -1 then begin
-          Unique.Add(sPackage);
-          Child := DBtree.AddChild(Node);
-          ChildData := Sender.GetNodeData(Child);
-          ChildData.Caption := sPackage;
-          ChildData.Key := ChildData.Caption + '.';
-          ChildData.NodeType := 'Package';
-          DBtree.HasChildren[Child] := True;
-          ChildCount := ChildCount+1;
-        end
-      end;
-    end
-    else if NodeData^.NodeType = 'Package' then begin
-      for I := 0 to FClasses.Count - 1 do
-      begin
-        sRow := FClasses[I];
-        if Pos(NodeData^.Key, sRow) = 1 then begin
-          Fetch(sRow, NodeData^.Key);
-          if Pos('.', sRow) = 0 then begin // this is Node Class
-            Child := DBtree.AddChild(Node);
-            ChildData := Sender.GetNodeData(Child);
-            ChildData.NodeType := 'Class';
-            sClass := Fetch(sRow, ';');
-            ChildData.Caption := sClass;
-            ChildData.isPersistent := Trim(sRow) = 'P';
-            sKey := FClasses[I];
-            sKey := Fetch(sKey, ';');
-            ChildData.Key := sKey;
-            ChildData.ClassName := sKey;
-            DBtree.HasChildren[Child] := False;
-            ChildCount := ChildCount+1;
-          end
-          else begin
-            sPackage := Fetch(sRow, '.');
-            if Unique.IndexOf(sPackage) = -1 then begin
-              Unique.Add(sPackage);
-              Child := DBtree.AddChild(Node);
-              ChildData := Sender.GetNodeData(Child);
-              ChildData.Caption := sPackage;
-              ChildData.Key := NodeData^.Key + sPackage + '.';
-              ChildData.NodeType := 'Package';
-              DBtree.HasChildren[Child] := True;
-              ChildCount := ChildCount+1;
-            end
-          end;
-        end
-      end;
-    end;
-    if ChildCount > 2 then
-      DBtree.Sort(Node, 0, sdAscending, True);
-  finally
-    Unique.Free;
-    DBtree.EndUpdate;
-  end;
-end;
-
-procedure TMainForm.DBtreeNodeClick(Sender: TBaseVirtualTree;
-  const HitInfo: THitInfo);
-begin
-  if Assigned(HitInfo.HitNode) and not (THitPosition.hiOnItemButton in HitInfo.HitPositions)
-     and not (THitPosition.hiOnItemButtonExact in HitInfo.HitPositions) then
-    Sender.ToggleNode(HitInfo.HitNode);
-end;
-
 procedure TMainForm.DesignerFormClose(Sender: TObject;
   var Action: TCloseAction);
 begin
@@ -435,7 +228,6 @@ end;
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
   FLoginShown := False;
-  FClasses := TStringList.Create;
   FIDEEngine := TMyIDEEngine.Create(Self);
   FIDEEngine.Scripter := cmp_IDEScripter;
   IDERegisterDataAccessTab(FIDEEngine as TIDEEngine);

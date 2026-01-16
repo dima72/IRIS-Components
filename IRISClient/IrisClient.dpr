@@ -4,13 +4,14 @@ uses
   Winapi.Windows,
   Vcl.Forms,
   main in 'main.pas' {MainForm},
-  SynIRISSyn in 'SynIRISSyn.pas',
   loginform in 'loginform.pas' {frmLogin},
   SysTools in 'SysTools.pas' {SysToolsFrm},
   dideactions in 'dideactions.pas' {dmIDEActions: TDataModule},
   fIDEEditor in 'fIDEEditor.pas' {IDEEditorForm},
   IDERegDBPalette in 'IDERegDBPalette.pas',
-  ap_X2IrisQuery in 'ap_X2IrisQuery.pas';
+  ap_X2IrisQuery in 'ap_X2IrisQuery.pas',
+  ClassExplorerFrme in 'ClassExplorerFrme.pas' {ClassExplorerFrame: TFrame},
+  FormsBindingForm in 'FormsBindingForm.pas' {FormsBindingFrm};
 
 {$R *.res}
 var
@@ -27,6 +28,7 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TMainForm, MainForm);
+  Application.CreateForm(TFormsBindingFrm, FormsBindingFrm);
   Application.Run;
   if Mutex <> 0 then
     CloseHandle(Mutex);

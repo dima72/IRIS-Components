@@ -33,8 +33,6 @@ object frmLogin: TfrmLogin
     Enabled = False
     TabOrder = 1
     OnClick = btnOKClick
-    ExplicitLeft = 254
-    ExplicitTop = 170
   end
   object pnlBackground: TPanel
     Left = 0
@@ -49,8 +47,6 @@ object frmLogin: TfrmLogin
     ParentBackground = False
     ShowCaption = False
     TabOrder = 0
-    ExplicitTop = 1
-    ExplicitHeight = 182
     DesignSize = (
       434
       186)
