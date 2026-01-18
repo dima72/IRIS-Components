@@ -209,6 +209,8 @@ end;
 procedure TMainForm.acSysToolsExecute(Sender: TObject);
 begin
   with TSysToolsFrm.Create(nil) do begin
+    qryX2IrisQuery.RestClient := RestClient;
+    qryX2IrisQuery.Namespace := ClassExplorer.Namespace;
     ShowModal;
     Free;
   end;

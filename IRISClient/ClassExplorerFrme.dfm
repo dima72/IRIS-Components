@@ -23,7 +23,6 @@ object ClassExplorerFrame: TClassExplorerFrame
     Align = alLeft
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitHeight = 664
     object DBtree: TVirtualStringTree
       Left = 0
       Top = 0
@@ -54,12 +53,11 @@ object ClassExplorerFrame: TClassExplorerFrame
       OnNodeClick = DBtreeNodeClick
       Touch.InteractiveGestures = [igPan, igPressAndTap]
       Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
-      ExplicitHeight = 664
       Columns = <
         item
           Position = 0
           Text = 'Name'
-          Width = 245
+          Width = 249
         end
         item
           Alignment = taRightJustify
@@ -79,8 +77,6 @@ object ClassExplorerFrame: TClassExplorerFrame
     Height = 445
     Align = alClient
     TabOrder = 1
-    ExplicitWidth = 889
-    ExplicitHeight = 664
   end
   object qryX2IrisQuery: TX2IrisQuery
     Active = False

@@ -157,6 +157,20 @@ object MainForm: TMainForm
       inherited DBtree: TVirtualStringTree
         Height = 589
         ExplicitHeight = 589
+        Columns = <
+          item
+            Position = 0
+            Text = 'Name'
+            Width = 245
+          end
+          item
+            Alignment = taRightJustify
+            MinWidth = 0
+            Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coAllowFocus]
+            Position = 1
+            Text = 'Size'
+            Width = 55
+          end>
         DefaultText = ''
       end
     end
@@ -14419,11 +14433,12 @@ object MainForm: TMainForm
     Authenticator = BaseAuthenticator
     Accept = 'application/json, text/plain; q=0.9, text/html;q=0.8,'
     AcceptCharset = 'utf-8, *;q=0.8'
+    BaseURL = 'http://localhost:52773/csp/clientapp'
     ContentType = 'application/json'
     Params = <>
     SynchronizedEvents = False
-    Left = 504
-    Top = 186
+    Left = 512
+    Top = 130
   end
   object BaseAuthenticator: THTTPBasicAuthenticator
     Username = 'restuser'

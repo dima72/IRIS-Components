@@ -53,6 +53,7 @@ begin
         WriteString('Login', 'UserName', edUsername.Text);
         WriteString('Login', 'Password', edPassword.Text);
         WriteBool('Login', 'RememberParams', True);
+        WriteString('Database', 'IrisURL', MainForm.RESTClient.BaseURL);
       end;
     end;
   end;
