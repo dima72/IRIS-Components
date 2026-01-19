@@ -153,6 +153,14 @@
             <Form>FormsBindingFrm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="ClassExplorerForm.pas">
+            <Form>ClassExplorerFrm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="ClassEditorForm.pas">
+            <Form>ClassEditorFrm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

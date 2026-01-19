@@ -11,7 +11,9 @@ uses
   IDERegDBPalette in 'IDERegDBPalette.pas',
   ap_X2IrisQuery in 'ap_X2IrisQuery.pas',
   ClassExplorerFrme in 'ClassExplorerFrme.pas' {ClassExplorerFrame: TFrame},
-  FormsBindingForm in 'FormsBindingForm.pas' {FormsBindingFrm};
+  FormsBindingForm in 'FormsBindingForm.pas' {FormsBindingFrm},
+  ClassExplorerForm in 'ClassExplorerForm.pas' {ClassExplorerFrm},
+  ClassEditorForm in 'ClassEditorForm.pas' {ClassEditorFrm};
 
 {$R *.res}
 var
@@ -28,7 +30,7 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TMainForm, MainForm);
-  Application.CreateForm(TFormsBindingFrm, FormsBindingFrm);
+  Application.CreateForm(TdmIDEActions, dmIDEActions);
   Application.Run;
   if Mutex <> 0 then
     CloseHandle(Mutex);

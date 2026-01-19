@@ -57,7 +57,7 @@ object ClassExplorerFrame: TClassExplorerFrame
         item
           Position = 0
           Text = 'Name'
-          Width = 249
+          Width = 245
         end
         item
           Alignment = taRightJustify

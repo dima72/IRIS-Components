@@ -132,6 +132,9 @@ type
     Compile1: TMenuItem;
     acViewLibraryBrowser: TAction;
     LibraryBrowser1: TMenuItem;
+    ClassExplorer1: TMenuItem;
+    ToolBar5: TToolBar;
+    ToolButton20: TToolButton;
     procedure PanelDockDrop(Sender: TObject; Source: TDragDockObject; X,
       Y: Integer);
     procedure PanelUnDock(Sender: TObject; Client: TControl;
@@ -625,7 +628,7 @@ procedure TIDEEditorForm.FormCreate(Sender: TObject);
 var
   c: integer;
 begin
-  FIDEActions := TdmIDEActions.Create(Self);
+  FIDEActions := dmIDEActions;
 
   {$IFDEF LIBBROWSER}
   FLibraryBrowser := TfmLibraryBrowser.Create(Self);

@@ -97,7 +97,7 @@ object FormsBindingFrm: TFormsBindingFrm
   end
   object X2IrisQuery1: TX2IrisQuery
     RestClient = MainForm.RESTClient
-    Active = False
+    Active = True
     SQL.Strings = (
       'SELECT * FROM X2IrisClient.Forms')
     Namespace = 'CLIENTAPP'
@@ -105,25 +105,30 @@ object FormsBindingFrm: TFormsBindingFrm
     Left = 144
     Top = 80
     object X2IrisQuery1ID: TIntegerField
+      DisplayWidth = 10
       FieldName = 'ID'
       Origin = 'ID'
     end
     object X2IrisQuery1FormName: TStringField
+      DisplayWidth = 28
       FieldName = 'FormName'
       Origin = 'FormName'
       Size = 50
     end
     object X2IrisQuery1RefClass: TStringField
+      DisplayWidth = 18
       FieldName = 'RefClass'
       Origin = 'RefClass'
       Size = 50
     end
     object X2IrisQuery1Resource: TWideMemoField
+      DisplayWidth = 10
       FieldName = 'Resource'
       Origin = 'Resource'
       BlobType = ftWideMemo
     end
     object X2IrisQuery1Script: TWideMemoField
+      DisplayWidth = 10
       FieldName = 'Script'
       Origin = 'Script'
       BlobType = ftWideMemo

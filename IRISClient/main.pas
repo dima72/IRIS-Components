@@ -35,7 +35,6 @@ type
 
   TMainForm = class(TForm)
     VirtualImageListMain: TVirtualImageList;
-    ImageCollectionIcons8: TImageCollection;
     ControlBarMain: TControlBar;
     ToolBarMainButtons: TToolBar;
     ToolButton9: TToolButton;
@@ -52,7 +51,6 @@ type
     cmp_IDEScripter: TIDEScripter;
     cmp_atPascalFormScripter: TatPascalFormScripter;
     DBNavigator1: TDBNavigator;
-    ClassExplorer: TClassExplorerFrame;
     MainMenu1: TMainMenu;
     MainMenuFile: TMenuItem;
     N5: TMenuItem;
@@ -60,11 +58,13 @@ type
     MainMenuTools: TMenuItem;
     MenuUserManager: TMenuItem;
     menuMaintenance: TMenuItem;
-    MainMenuGoto: TMenuItem;
     MainMenuHelp: TMenuItem;
     acFormsBinding: TAction;
     RESTClient: TRESTClient;
     BaseAuthenticator: THTTPBasicAuthenticator;
+    ToolButton2: TToolButton;
+    ClassExplorer1: TMenuItem;
+    ClassExplorer: TClassExplorerFrame;
     procedure acRefreshExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure acSysToolsExecute(Sender: TObject);
@@ -100,7 +100,8 @@ implementation
 
 {$R *.dfm}
 
-uses loginform, SysTools, fIDEEditor, IDERegDBPalette, FormsBindingForm;
+uses loginform, SysTools, fIDEEditor, IDERegDBPalette, FormsBindingForm,
+  dIDEActions;
 
 
 procedure EnsureDir(const APath: string);

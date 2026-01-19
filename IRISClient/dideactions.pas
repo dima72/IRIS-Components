@@ -13,7 +13,8 @@ uses
   {$ENDIF}
   fObjectInspector, fWatches,
   *)
-  atScripter, ScrMemo, System.ImageList, System.Actions;
+  atScripter, ScrMemo, System.ImageList, System.Actions, main, ClassExplorerForm,
+  Vcl.BaseImageCollection, Vcl.ImageCollection, Vcl.VirtualImageList;
 
 type
   TLastSearchMode = (lsNone, lsFind, lsReplace);
@@ -70,6 +71,10 @@ type
     ReplaceDialog1: TScrMemoFindReplaceDialog;
     acRedo: TAction;
     acCompile: TAction;
+    ImageCollectionIcons8: TImageCollection;
+    VirtualImageList1: TVirtualImageList;
+    ActionList2: TActionList;
+    acClassExplorer: TAction;
     procedure acNewPascalUnitExecue(Sender: TObject);
     procedure acNewFormExecute(Sender: TObject);
     procedure acOpenFileExecute(Sender: TObject);
@@ -132,15 +137,20 @@ type
     procedure acRedoUpdate(Sender: TObject);
     procedure acRedoExecute(Sender: TObject);
     procedure acCompileExecute(Sender: TObject);
+    procedure acClassExplorerExecute(Sender: TObject);
+    procedure ActionList2Update(Action: TBasicAction; var Handled: Boolean);
   private
     FEngine: TIDEEngine;
     FLastSearch: TLastSearchMode;
+    FClassExplorer: TClassExplorerFrm;
     (*FInspectorForm: TfmObjectInspector;
     {$IFDEF DELPHI9_LVL}
     FPaletteForm: TfmToolPalette;
     {$ENDIF}
     FWatchesForm: TfmWatches;*)
     procedure SetEngine(const Value: TIDEEngine);
+    procedure OnClassExplorerClose(Sender: TObject; var Action: TCloseAction);
+
     //function GetScripter: TatCustomScripter;
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -155,8 +165,8 @@ type
     {$ENDIF}*)
   end;
 
-//var
-  //dmIDEActions: TdmIDEActions;
+var
+  dmIDEActions: TdmIDEActions;
 
 implementation
 uses Clipbrd;
@@ -779,5 +789,36 @@ begin
     MessageDlg('Project compiled.', mtInformation, [mbOk], 0);
   end;
 end;
+
+procedure TdmIDEActions.OnClassExplorerClose(Sender: TObject; var Action: TCloseAction);
+begin
+  FClassExplorer := nil;
+  Action := caFree;
+end;
+
+procedure TdmIDEActions.acClassExplorerExecute(Sender: TObject);
+begin
+  if not Assigned(FClassExplorer) then begin
+    FClassExplorer := TClassExplorerFrm.Create(nil);
+    FClassExplorer.OnClose := OnClassExplorerClose;
+  end;
+  with FClassExplorer do begin
+    ClassExplorer.RestClient := MainForm.RESTClient;
+    ClassExplorer.Namespace := MainForm.ClassExplorer.Namespace;
+    ClassExplorer.InitDBTree;
+    Show;
+  end;
+end;
+
+
+procedure TdmIDEActions.ActionList2Update(Action: TBasicAction;
+  var Handled: Boolean);
+begin
+  if Assigned(FClassExplorer) then
+    FClassExplorer.UpdateActions;
+end;
+
+
+
 
 end.

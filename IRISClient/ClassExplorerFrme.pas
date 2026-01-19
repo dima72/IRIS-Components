@@ -46,9 +46,12 @@ type
       const HitInfo: THitInfo);
   private
     { Private declarations }
+    FShowAllClasses: Boolean;
     FOnNodeSelect: TNodeEvent;
     FClasses: TStringList;
     function GetNamespace: string;
+    function GetRestClient: TRestClient;
+    procedure SetRestClient(const AVal: TRestClient);
     procedure SetNamespace(const Value: string);
   public
     { Public declarations }
@@ -56,6 +59,8 @@ type
     destructor Destroy; override;
     procedure InitDBTree;
     property  Namespace: string read GetNamespace write SetNamespace;
+    property RestClient: TRESTClient read GetRestClient write SetRestClient;
+    property ShowAllClasses: Boolean read FShowAllClasses write FShowAllClasses;
   published
     property OnNodeSelect: TNodeEvent read FOnNodeSelect write FOnNodeSelect;
   end;
@@ -79,6 +84,7 @@ constructor TClassExplorerFrame.Create(AOwner: TComponent);
 begin
   inherited;
   FClasses := TStringList.Create;
+  FShowAllClasses := False;
 end;
 
 procedure TClassExplorerFrame.DBtreeCompareNodes(Sender: TBaseVirtualTree;
@@ -242,6 +248,16 @@ begin
   Result := qryX2IrisQuery.Namespace;
 end;
 
+function TClassExplorerFrame.GetRestClient: TRestClient;
+begin
+  Result := qryX2IrisQuery.RestClient;
+end;
+
+procedure TClassExplorerFrame.SetRestClient(const AVal: TRestClient);
+begin
+  qryX2IrisQuery.RestClient := AVal;
+end;
+
 procedure TClassExplorerFrame.SetNamespace(const Value: string);
 begin
   qryX2IrisQuery.Namespace := Value;
@@ -262,8 +278,12 @@ begin
     NodeData^.NodeType := 'Root';
     NodeData^.Key := '';
     DBtree.HasChildren[RootNode] := True;
-    FClasses.Text := qryX2IrisQuery.DoClassMethod('X2IrisClient.RESTServer',
-    'RunScript', [Namespace, RSScriptGetClassesNodes]);
+    if FShowAllClasses then
+      FClasses.Text := qryX2IrisQuery.DoClassMethod('X2IrisClient.RESTServer',
+        'RunScript', [Namespace, RSScriptGetClassesNodes])
+    else
+      FClasses.Text := qryX2IrisQuery.DoClassMethod('X2IrisClient.RESTServer',
+        'GetUserClasses', [Namespace]);
   finally
     DBtree.EndUpdate;
   end;

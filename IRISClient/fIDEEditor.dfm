@@ -1204,7 +1204,7 @@ object IDEEditorForm: TIDEEditorForm
     object ToolBar3: TToolBar
       Left = 201
       Top = 2
-      Width = 73
+      Width = 72
       Height = 22
       AutoSize = True
       Caption = 'ToolBar1'
@@ -1289,6 +1289,20 @@ object IDEEditorForm: TIDEEditorForm
         Left = 154
         Top = 0
         Action = dmIDEActions.acAddWatch
+      end
+    end
+    object ToolBar5: TToolBar
+      Left = 481
+      Top = 2
+      Width = 24
+      Height = 22
+      Caption = 'ToolBar5'
+      Images = dmIDEActions.VirtualImageList1
+      TabOrder = 4
+      object ToolButton20: TToolButton
+        Left = 0
+        Top = 0
+        Action = dmIDEActions.acClassExplorer
       end
     end
   end
@@ -1503,24 +1517,29 @@ object IDEEditorForm: TIDEEditorForm
       Caption = '&File'
       object NewUnit1: TMenuItem
         Action = dmIDEActions.acNewUnit
+        ImageName = 'icons8-compose'
       end
       object NewForm1: TMenuItem
         Action = dmIDEActions.acNewForm
+        ImageName = 'icons8-help'
       end
       object N7: TMenuItem
         Caption = '-'
       end
       object Newproject1: TMenuItem
         Action = dmIDEActions.acNewProject
+        ImageName = 'icons8-html'
       end
       object Openproject1: TMenuItem
         Action = dmIDEActions.acOpenProject
+        ImageName = 'icons8-connected'
       end
       object N4: TMenuItem
         Caption = '-'
       end
       object Open1: TMenuItem
         Action = dmIDEActions.acOpenFile
+        ImageName = 'icons8-print'
       end
       object Removefromproject1: TMenuItem
         Action = dmIDEActions.acRemoveFromProject
@@ -1530,24 +1549,30 @@ object IDEEditorForm: TIDEEditorForm
       end
       object Save1: TMenuItem
         Action = dmIDEActions.acSaveFile
+        ImageName = 'icons8-server'
       end
       object Saveas1: TMenuItem
         Action = dmIDEActions.acSaveAsFile
+        ImageName = 'icons8-support'
       end
       object Saveprojectas1: TMenuItem
         Action = dmIDEActions.acSaveProjectAs
+        ImageName = 'icons8-reset'
       end
       object Saveall1: TMenuItem
         Action = dmIDEActions.acSaveAll
+        ImageName = 'icons8-go'
       end
       object N2: TMenuItem
         Caption = '-'
       end
       object Closefile1: TMenuItem
         Action = dmIDEActions.acCloseFile
+        ImageName = 'icons8-find'
       end
       object Closeall1: TMenuItem
         Action = dmIDEActions.acCloseAll
+        ImageName = 'icons8-disconnected'
       end
       object N3: TMenuItem
         Caption = '-'
@@ -1560,21 +1585,26 @@ object IDEEditorForm: TIDEEditorForm
       Caption = 'Edit'
       object Undo1: TMenuItem
         Action = dmIDEActions.acUndo
+        ImageName = 'icons8-server-100-export'
       end
       object Redo1: TMenuItem
         Action = dmIDEActions.acRedo
+        ImageName = 'icons8-data-grid'
       end
       object N10: TMenuItem
         Caption = '-'
       end
       object Cut1: TMenuItem
         Action = dmIDEActions.acCutClipboard
+        ImageName = 'icons8-export-100'
       end
       object Copy1: TMenuItem
         Action = dmIDEActions.acCopyClipboard
+        ImageName = 'icons8-add-user-male-100'
       end
       object Paste1: TMenuItem
         Action = dmIDEActions.acPasteClipboard
+        ImageName = 'icons8-key-100-blue'
       end
       object Delete1: TMenuItem
         Action = dmIDEActions.acDeleteControl
@@ -1587,9 +1617,11 @@ object IDEEditorForm: TIDEEditorForm
       end
       object Find1: TMenuItem
         Action = dmIDEActions.acFind
+        ImageName = 'icons8-support'
       end
       object Replace1: TMenuItem
         Action = dmIDEActions.acReplace
+        ImageName = 'icons8-undo'
       end
       object Searchagain1: TMenuItem
         Action = dmIDEActions.acSearchAgain
@@ -1623,15 +1655,22 @@ object IDEEditorForm: TIDEEditorForm
       Caption = 'View'
       object ObjectInspector1: TMenuItem
         Action = acViewInspector
+        ImageName = 'icons8-key'
       end
       object ToolPalette1: TMenuItem
         Action = acViewPalette
+        ImageName = 'icons8-close-button'
       end
       object Watches1: TMenuItem
         Action = acViewWatches
+        SubMenuImages = dmIDEActions.VirtualImageList1
+        ImageName = 'icons8-data-backup'
       end
       object LibraryBrowser1: TMenuItem
         Action = acViewLibraryBrowser
+      end
+      object ClassExplorer1: TMenuItem
+        Action = dmIDEActions.acClassExplorer
       end
       object N9: TMenuItem
         Caption = '-'
@@ -1644,6 +1683,7 @@ object IDEEditorForm: TIDEEditorForm
       Caption = '&Run'
       object Run2: TMenuItem
         Action = dmIDEActions.acRun
+        ImageName = 'icons8-outgoing-data-100'
       end
       object Compile1: TMenuItem
         Action = dmIDEActions.acCompile
@@ -1653,30 +1693,38 @@ object IDEEditorForm: TIDEEditorForm
       end
       object Stepover1: TMenuItem
         Action = dmIDEActions.acStepOver
+        ImageName = 'icons8-user-account-100'
       end
       object Traceinto1: TMenuItem
         Action = dmIDEActions.acTraceInto
+        ImageName = 'icons8-edit'
       end
       object Runtocursor1: TMenuItem
         Action = dmIDEActions.acRunTo
+        ImageName = 'icons8-data-sheet-100-delete'
       end
       object Rununtilreturn1: TMenuItem
         Action = dmIDEActions.acReturn
+        ImageName = 'icons8-lightning-bolt-100'
       end
       object Pause1: TMenuItem
         Action = dmIDEActions.acPause
+        ImageName = 'icons8-delete-database-100'
       end
       object Scriptreset1: TMenuItem
         Action = dmIDEActions.acReset
+        ImageName = 'icons8-database-administrator-100'
       end
       object N6: TMenuItem
         Caption = '-'
       end
       object Addwatch1: TMenuItem
         Action = dmIDEActions.acAddWatch
+        ImageName = 'icons8-database-100'
       end
       object Togglebreakpoint1: TMenuItem
         Action = dmIDEActions.acToggleBreak
+        ImageName = 'icons8-paste-100'
       end
     end
     object Project1: TMenuItem
@@ -1723,7 +1771,7 @@ object IDEEditorForm: TIDEEditorForm
     end
   end
   object PopupMenu1: TPopupMenu
-    Left = 474
-    Top = 42
+    Left = 522
+    Top = 50
   end
 end
