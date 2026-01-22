@@ -125,10 +125,6 @@ begin
     IDEEditorForm.ForceOldPalette := true;
     IDEEditorForm.AttachEngine(FIDEEngine);
 
-    {Proxy := TRestClient.Create(IDEEditorForm.IDEFormDesignControl1.EditForm);
-    Proxy.Name := 'RestClient1';
-    cmp_IDEScripter.AddComponent(Proxy);}
-
     FIDEEngine.OpenProject(IncludeTrailingPathDelimiter(FormsDirectory) + ScriptProjectFN);
     FIDEEngine.Inspector.OnFilter := IDEInspectorFilter;
 

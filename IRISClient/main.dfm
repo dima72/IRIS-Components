@@ -162,6 +162,20 @@ object MainForm: TMainForm
       inherited DBtree: TVirtualStringTree
         Height = 589
         ExplicitHeight = 589
+        Columns = <
+          item
+            Position = 0
+            Text = 'Name'
+            Width = 245
+          end
+          item
+            Alignment = taRightJustify
+            MinWidth = 0
+            Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coAllowFocus]
+            Position = 1
+            Text = 'Size'
+            Width = 55
+          end>
         DefaultText = ''
       end
     end
