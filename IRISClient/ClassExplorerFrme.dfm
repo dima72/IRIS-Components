@@ -81,8 +81,13 @@ object ClassExplorerFrame: TClassExplorerFrame
   object qryX2IrisQuery: TX2IrisQuery
     Active = False
     SQL.Strings = (
-      'SELECT * FROM %Dictionary.ClassDefinition')
-    Left = 22
-    Top = 126
+      '')
+    Left = 78
+    Top = 54
+  end
+  object qryForms: TX2IrisQuery
+    Active = False
+    Left = 72
+    Top = 144
   end
 end

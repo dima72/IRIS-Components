@@ -50,7 +50,6 @@ type
     ToolButton1: TToolButton;
     cmp_IDEScripter: TIDEScripter;
     cmp_atPascalFormScripter: TatPascalFormScripter;
-    DBNavigator1: TDBNavigator;
     MainMenu1: TMainMenu;
     MainMenuFile: TMenuItem;
     N5: TMenuItem;
@@ -65,6 +64,7 @@ type
     ToolButton2: TToolButton;
     ClassExplorer1: TMenuItem;
     ClassExplorer: TClassExplorerFrame;
+    Permissions1: TMenuItem;
     procedure acRefreshExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure acSysToolsExecute(Sender: TObject);
@@ -117,7 +117,6 @@ var
   Proxy: TRestClient;
 begin
   IsModal := False;
-  RegisterDefaultRestClientAndNamespace(RestClient, ClassExplorer.Namespace);
   IDEEditorForm := TIDEEditorForm.Create(Application, ShowInTaskBar);
   try
     IDEEditorForm.Width := Width;

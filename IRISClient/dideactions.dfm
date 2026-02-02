@@ -15851,5 +15851,10 @@ object dmIDEActions: TdmIDEActions
       ImageName = 'icons8-azure'
       OnExecute = acClassExplorerExecute
     end
+    object acPermissions: TAction
+      Caption = 'Permissions'
+      Hint = 'Permissions'
+      OnExecute = acPermissionsExecute
+    end
   end
 end

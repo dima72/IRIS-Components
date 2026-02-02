@@ -31,6 +31,7 @@ type
     spltDBtree: TSplitter;
     qryX2IrisQuery: TX2IrisQuery;
     pnlRight: TPanel;
+    qryForms: TX2IrisQuery;
     procedure DBtreeCompareNodes(Sender: TBaseVirtualTree; Node1,
       Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
     procedure DBtreeFocusChanged(Sender: TBaseVirtualTree; Node: PVirtualNode;
@@ -49,6 +50,7 @@ type
     FShowAllClasses: Boolean;
     FOnNodeSelect: TNodeEvent;
     FClasses: TStringList;
+    FPanelFrm: TForm;
     function GetNamespace: string;
     function GetRestClient: TRestClient;
     procedure SetRestClient(const AVal: TRestClient);
@@ -60,7 +62,6 @@ type
     procedure InitDBTree;
     property  Namespace: string read GetNamespace write SetNamespace;
     property RestClient: TRESTClient read GetRestClient write SetRestClient;
-    property ShowAllClasses: Boolean read FShowAllClasses write FShowAllClasses;
   published
     property OnNodeSelect: TNodeEvent read FOnNodeSelect write FOnNodeSelect;
   end;
@@ -85,6 +86,7 @@ begin
   inherited;
   FClasses := TStringList.Create;
   FShowAllClasses := False;
+  FPanelFrm := nil;
 end;
 
 procedure TClassExplorerFrame.DBtreeCompareNodes(Sender: TBaseVirtualTree;
@@ -108,20 +110,25 @@ procedure TClassExplorerFrame.DBtreeFocusChanged(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex);
 var
   NodeData: PNodeData;
+  C: TPersistentClass;
 begin
   if not Assigned(Node) then Exit;
   NodeData := Sender.GetNodeData(Node);
-  if Assigned(NodeData) and Assigned(FOnNodeSelect) then begin
-    FOnNodeSelect(Self, NodeData);
-    {
-    if NodeData^.NodeType = 'Class' then begin
-        //qryX2IrisQuery.DoClassMethod('X2IrisClient.RESTServer', 'GetClassText',
-        //  [CurrentNamespace, NodeData^.Key]);
+  if Assigned(NodeData) and Assigned(FOnNodeSelect) then
+    FOnNodeSelect(Self, NodeData)
+  else begin
+    C := GetClass('TPermissionsFrm');
+    if Assigned(C) and C.InheritsFrom(TForm) then
+    begin
+      FPanelFrm.Free;
+      FPanelFrm := TFormClass(C).Create(Application);
+      FPanelFrm.Parent := pnlRight;
+      FPanelFrm.Align := alClient;
+      FPanelFrm.BorderStyle := bsNone;
+      FPanelFrm.Show;
     end
-    else if NodeData^.NodeType = 'Package' then begin
-      Sender.Expanded[Node] := False;
-    end;
-    }
+    else
+      raise Exception.Create('Form class not registered: TPermissionsFrm');
   end;
 end;
 
@@ -278,15 +285,15 @@ begin
     NodeData^.NodeType := 'Root';
     NodeData^.Key := '';
     DBtree.HasChildren[RootNode] := True;
-    if FShowAllClasses then
-      FClasses.Text := qryX2IrisQuery.DoClassMethod('X2IrisClient.RESTServer',
-        'RunScript', [Namespace, RSScriptGetClassesNodes])
-    else
-      FClasses.Text := qryX2IrisQuery.DoClassMethod('X2IrisClient.RESTServer',
-        'GetUserClasses', [Namespace]);
+    qryX2IrisQuery.CheckRestClientAndNamespace;
+    FClasses.Text := qryX2IrisQuery.DoClassMethod('X2IrisClient.RESTServer',
+      'RunScript', [Namespace, RSScriptGetClassesNodes])
   finally
     DBtree.EndUpdate;
   end;
+  qryForms.Active := False;
+  qryForms.SQL.Text := 'SELECT * FROM X2IrisClient.Forms';
+  qryForms.Active := True;
 end;
 
 

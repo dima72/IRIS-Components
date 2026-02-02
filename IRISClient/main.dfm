@@ -28,7 +28,7 @@ object MainForm: TMainForm
     ShowHint = True
     TabOrder = 0
     object ToolBarMainButtons: TToolBar
-      Left = 264
+      Left = 11
       Top = 2
       Width = 121
       Height = 22
@@ -73,7 +73,7 @@ object MainForm: TMainForm
       end
     end
     object ToolBarDonate: TToolBar
-      Left = 400
+      Left = 145
       Top = 2
       Width = 65
       Height = 22
@@ -97,13 +97,6 @@ object MainForm: TMainForm
         Caption = 'Donate'
         ImageIndex = 185
       end
-    end
-    object DBNavigator1: TDBNavigator
-      Left = 11
-      Top = 2
-      Width = 240
-      Height = 22
-      TabOrder = 2
     end
   end
   object StatusBar: TStatusBar
@@ -162,20 +155,6 @@ object MainForm: TMainForm
       inherited DBtree: TVirtualStringTree
         Height = 589
         ExplicitHeight = 589
-        Columns = <
-          item
-            Position = 0
-            Text = 'Name'
-            Width = 245
-          end
-          item
-            Alignment = taRightJustify
-            MinWidth = 0
-            Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coAllowFocus]
-            Position = 1
-            Text = 'Size'
-            Width = 55
-          end>
         DefaultText = ''
       end
     end
@@ -297,6 +276,9 @@ object MainForm: TMainForm
       end
       object ClassExplorer1: TMenuItem
         Action = dmIDEActions.acClassExplorer
+      end
+      object Permissions1: TMenuItem
+        Action = dmIDEActions.acPermissions
       end
     end
     object MainMenuHelp: TMenuItem

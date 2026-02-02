@@ -42,6 +42,7 @@ requires
 
 contains
   CustomDebugDialog in 'CustomDebugDialog.pas' {frmCustomDebug},
-  X2IrisQuery in 'X2IrisQuery.pas';
+  X2IrisQuery in 'X2IrisQuery.pas',
+  uCheckError in 'uCheckError.pas';
 
 end.

@@ -37,7 +37,6 @@ type
     procedure HTTPProtocolError(Sender: TCustomRESTRequest);
     //do not touch TDataSet SetActive.
     procedure SetActive2(AValue: Boolean);
-    //procedure SetAdapter(AAdapter: TFDCustomTableAdapter);
     function RecordToJson(AChangedValues: Boolean): TJSONObject;
     function PostObjectAndGetID(AOperation: TDataSetState): string;
     function DeleteOnServer(AID: string): Boolean;
@@ -47,11 +46,12 @@ type
     procedure DoAfterPost; override;
     procedure DoBeforeEdit; override;
     procedure DoBeforeDelete; override;
-   // property Adapter: TFDCustomTableAdapter write SetAdapter stored False default nil;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     function DoClassMethod(AClass: string;  AMethod: string; const AParams: array of string): string;
+    procedure CheckRestClientAndNamespace;
+    procedure GetList(ATableName: string; AFieldName: string; AOutList: TStrings);
     procedure GetNamespaces(AList: TStrings; ADefaultNamespace: string);
     procedure Open; overload;
     procedure Close;
@@ -163,10 +163,6 @@ begin
   FRestRequest.Response := FRestResponse;
   FSQL := TStringList.Create;
   (FSQL as TStringList).OnChange := SQLChanged;
-  if Assigned(GRestClient) then
-    SetRestClient(GRestClient);
-  if GNamespace <> '' then
-    FNamespace := GNamespace;
   FOriginalValues := TDictionary<string,string>.Create;
 end;
 
@@ -175,6 +171,14 @@ begin
   FSQL.Free;
   FOriginalValues.Free;
   inherited;
+end;
+
+procedure TX2IrisQuery.CheckRestClientAndNamespace;
+begin
+  if Assigned(GRestClient) then
+    SetRestClient(GRestClient);
+  if GNamespace <> '' then
+    FNamespace := GNamespace;
 end;
 
 procedure TX2IrisQuery.SetRestClient(ARestClient: TRESTClient);
@@ -238,9 +242,10 @@ var
   SS: TStringStream;
 begin
   if csLoading in ComponentState then Exit;
+  CheckRestClientAndNamespace;
   CheckError(Assigned(FRestClient), 'RestClient is not assigned');
-  CheckError(not FSQL.IsEmpty, 'SQL property is Empty');
   CheckError(FNamespace <> '', 'Namespace property is Empty');
+  CheckError(not FSQL.IsEmpty, 'Property SQL - text is Empty');
 
   FDatasetOpened := False;
   // Configure POST request
@@ -283,7 +288,9 @@ var
   Req, Args: TJSONArray;
   i: Integer;
 begin
+  CheckRestClientAndNamespace;
   CheckError(Assigned(FRestClient), 'RestClient is not assigned');
+  CheckError(FNamespace <> '', 'Namespace property is Empty');
   try
     // Configure POST request
     FRestRequest.Method := rmPOST;
@@ -427,6 +434,7 @@ function TX2IrisQuery.PostObjectAndGetID(AOperation: TDataSetState): string;
 var
   JSONObject, DataObj: TJSONObject;
 begin
+  CheckRestClientAndNamespace;
   CheckError(Assigned(FRestClient), 'RestClient is not assigned');
   CheckError(FIrisClass <> '', 'IrisClass property is Empty');
   try
@@ -475,6 +483,7 @@ function TX2IrisQuery.DeleteOnServer(AID: string): Boolean;
 var
   JSONObject: TJSONObject;
 begin
+  CheckRestClientAndNamespace;
   CheckError(Assigned(FRestClient), 'RestClient is not assigned');
   CheckError(FIrisClass <> '', 'IrisClass property is Empty');
   try
@@ -505,6 +514,37 @@ begin
     end;
   end;
 end;
+
+procedure TX2IrisQuery.GetList(ATableName: string; AFieldName: string; AOutList: TStrings);
+var
+  qry: TX2IrisQuery;
+begin
+  CheckError(Assigned(FRestClient), 'RestClient is not assigned');
+  CheckError(Assigned(AOutList), 'AOutList = nil');
+  try
+    qry := TX2IrisQuery.Create(nil);
+    with qry do
+    try
+      SQL.Text := Format('SELECT ID, %s FROM %s', [AFieldName, ATableName]);
+      Active := True;
+      while not Eof do begin
+        AOutList.Add(FieldByName(AFieldName).AsString);
+        Next;
+      end;
+    finally
+      Free;
+    end;
+  except
+    on E: Exception do begin
+      ShowDebugMessage('TX2IrisQuery.GetList. Exception: '+ E.Message + #13#10 +
+       'StatusText: ' + FRestResponse.StatusText + #13#10 +
+       'StatusCode: ' + IntToStr(FRestResponse.StatusCode) + #13#10 +
+       FRestResponse.Content, 'Debug');
+      Abort;
+    end;
+  end;
+end;
+
 
 initialization
   GRestClient := nil;

@@ -1,15 +1,15 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{D6DD2C4F-A94B-4C1C-8AA0-0AE329710CCC}</ProjectGuid>
+        <ProjectGuid>{9A8D006D-CE77-403B-B2AC-E425B36338C9}</ProjectGuid>
         <ProjectVersion>20.2</ProjectVersion>
         <FrameworkType>VCL</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
-        <ProjectName Condition="'$(ProjectName)'==''">IrisClient</ProjectName>
-        <TargetedPlatforms>3</TargetedPlatforms>
+        <ProjectName Condition="'$(ProjectName)'==''">IrisWebClient</ProjectName>
+        <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Application</AppType>
-        <MainSource>IrisClient.dpr</MainSource>
+        <MainSource>IrisWebClient.dpr</MainSource>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
         <Base>true</Base>
@@ -35,12 +35,6 @@
         <Cfg_1>true</Cfg_1>
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win64)'!=''">
-        <Cfg_1_Win64>true</Cfg_1_Win64>
-        <CfgParent>Cfg_1</CfgParent>
-        <Cfg_1>true</Cfg_1>
-        <Base>true</Base>
-    </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
         <Cfg_2>true</Cfg_2>
         <CfgParent>Base</CfgParent>
@@ -48,12 +42,6 @@
     </PropertyGroup>
     <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
         <Cfg_2_Win32>true</Cfg_2_Win32>
-        <CfgParent>Cfg_2</CfgParent>
-        <Cfg_2>true</Cfg_2>
-        <Base>true</Base>
-    </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win64)'!=''">
-        <Cfg_2_Win64>true</Cfg_2_Win64>
         <CfgParent>Cfg_2</CfgParent>
         <Cfg_2>true</Cfg_2>
         <Base>true</Base>
@@ -68,12 +56,11 @@
         <DCC_K>false</DCC_K>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
-        <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
-        <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
-        <SanitizedProjectName>IrisClient</SanitizedProjectName>
+        <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
+        <SanitizedProjectName>IrisWebClient</SanitizedProjectName>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
-        <DCC_UsePackage>dxPScxCommonRS29;dxPSdxChartControlLnkRS29;dxRibbonRS29;RaizeComponentsVcl;vclwinx;DataSnapServer;dxPScxExtCommonRS29;dxRichEditControlCoreRS29;fmx;dxSpreadSheetReportDesignerRS29;vclie;DbxCommonDriver;bindengine;IndyIPCommon;VCLRESTComponents;DBXMSSQLDriver;FireDACCommonODBC;emsclient;dxComnRS29;dxFlowChartDesignerRS29;appanalytics;IndyProtocols;vclx;Skia.Package.RTL;dxBarExtDBItemsRS29;dbxcds;vcledge;cxVerticalGridRS29;AbbreviaD;aurelius;FmxTeeUI;cxFireDACAdaptersRS29;dxPSDBTeeChartRS29;cxSchedulerWebServiceStorageRS29;DBXFirebirdDriver;dxRichEditControlRS29;dxPsPrVwAdvRS29;VclPrintDat;FireDACSqliteDriver;DbxClientDriver;dxPSdxGaugeControlLnkRS29;soapmidas;dxRibbonCustomizationFormRS29;TeeUI;dbexpress;Python;dxEMFRS29;dxDockingRS29;inet;AsyncProDR;vcltouch;PythonVcl;ipstudiowin;dxPSdxFCLnkRS29;dxorgcRS29;FireDACDBXDriver;dxSpreadSheetCoreConditionalFormattingDialogsRS29;fmxdae;SysToolsDR;dxPSRichEditControlLnkRS29;dxPSdxSpreadSheetLnkRS29;CustomIPTransport;FireDACMSSQLDriver;tmsbcl;ipstudiowinwordxp;PKIEDB29;cxADOAdaptersRS29;madExcept_;dxPSPrVwRibbonRS29;IndySystem;dxPScxTLLnkRS29;dxPSdxDBOCLnkRS29;dxGDIPlusRS29;BlowfishD;VirtualTreesR;vclFireDAC;dxPSCoreRS29;madDisAsm_;dxSpreadSheetRS29;FireDACCommon;DataSnapServerMidas;FireDACODBCDriver;emsserverresource;cxGridEMFRS29;dxPSdxMapControlLnkRS29;dxGanttControlRS29;dxPScxVGridLnkRS29;dxPScxPivotGridLnkRS29;dxADOServerModeRS29;dxWizardControlRS29;bindcompdbx;rtl;FireDACMySQLDriver;dxCloudServiceLibraryRS29;dxServerModeRS29;remotedb;DBXSqliteDriver;IcsCommonNewRun;dxBarDBNavRS29;DBXSybaseASEDriver;dxSpreadSheetCoreRS29;dxNavBarRS29;vclimg;DataSnapFireDAC;inetdbxpress;FireDAC;xmlrtl;dxFireDACEMFRS29;dsnap;xdata;FireDACDb2Driver;dxPSdxLCLnkRS29;DBXOracleDriver;DBXInformixDriver;fmxobj;bindcompvclsmp;DataSnapNativeClient;DatasnapConnectorsFreePascal;dxPSLnksRS29;dxmdsRS29;dxPSdxOCLnkRS29;cxSchedulerGridRS29;dxPScxSchedulerLnkRS29;TMSLogging;emshosting;dxADOEMFRS29;dxChartControlRS29;dxPSdxDBTVLnkRS29;sparkle;FireDACCommonDriver;sphinx;dxGaugeControlRS29;IndyIPClient;dxPDFViewerRS29;bindcompvclwinx;dxOrgChartAdvancedCustomizeFormRS29;emsedge;bindcompfmx;dxBarExtItemsRS29;SysToolsDBDR;madBasic_;dxFlowChartLayoutsRS29;inetdb;dxdborRS29;FireDACASADriver;Tee;dxPScxGridLnkRS29;cxPivotGridChartRS29;vclactnband;fmxFireDAC;officeXPrt;FireDACInfxDriver;dxRichEditCoreRS29;cxTreeListdxBarPopupMenuRS29;DBXMySQLDriver;dxFlowChartAdvancedCustomizeFormRS29;VclSmp;cxSchedulerRibbonStyleEventEditorRS29;DataSnapCommon;OnGuardDR;dxPSTeeChartRS29;fmxase;EurekaLogCore;dxtrmdRS29;dxFlowChartRS29;DBXOdbcDriver;dbrtl;dxPScxPCProdRS29;FireDACOracleDriver;Skia.Package.FMX;CodeSiteExpressPkg;TeeDB;FireDACMSAccDriver;cxGridRS29;dxSpellCheckerRS29;AbbreviaVCLD;DataSnapIndy10ServerTransport;dxRichEditDocumentModelRS29;dxMapControlRS29;DataSnapConnectors;PKIECtrl29;vcldsnap;DBXInterBaseDriver;FireDACMongoDBDriver;FireDACTDataDriver;cxLibraryRS29;ipstudiowinclient;Skia.Package.VCL;vcldb;dxPSdxPDFViewerLnkRS29;cxSchedulerTreeBrowserRS29;bindcomp;dxTabbedMDIRS29;cxExportRS29;inetstn;IndyCore;RESTBackendComponents;inetwinsockets;OfficeViewer;dxHttpIndyRequestRS29;dxTileControlRS29;dxFireDACServerModeRS29;GigasoftD;cxPivotGridOLAPRS29;FireDACADSDriver;RaizeComponentsVclDb;RESTComponents;IndyIPServer;vcl;dsnapxml;adortl;dsnapcon;DataSnapClient;DataSnapProviderClient;dxCoreRS29;cxPivotGridRS29;dxdbtrRS29;SAPTypeLibsUD;IcsVclNewRun;DBXDb2Driver;dxSkinsCoreRS29;emsclientfiredac;FireDACPgDriver;FireDACDSDriver;dxBarRS29;tethering;bindcompvcl;CloudService;DBXSybaseASADriver;dxSpreadSheetConditionalFormattingDialogsRS29;cxTreeListRS29;FMXTee;soaprtl;dxDBXServerModeRS29;cxSchedulerRS29;soapserver;FireDACIBDriver;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_UsePackage>dxPScxExtCommonRS29;dxRichEditControlCoreRS29;vclie;bindengine;IndyIPCommon;aurelius;cxVerticalGridRS29;dbxcds;vcledge;dxPSDBTeeChartRS29;cxSchedulerWebServiceStorageRS29;dxRichEditControlRS29;dxPsPrVwAdvRS29;dxPSdxGaugeControlLnkRS29;TMSScripter_IDE;dxRibbonCustomizationFormRS29;dbexpress;dxEMFRS29;inet;PythonVcl;vcltouch;uniGUI29VCL;dxPSdxFCLnkRS29;FireDACDBXDriver;dxSpreadSheetCoreConditionalFormattingDialogsRS29;SysToolsDR;tmsbcl;CustomIPTransport;FireDACMSSQLDriver;ipstudiowinwordxp;madExcept_;dxPScxTLLnkRS29;VirtualTreesR;vclFireDAC;dxSpreadSheetRS29;FireDACODBCDriver;DelphiAIDeveloper;emsserverresource;dxPScxVGridLnkRS29;rtl;dxServerModeRS29;DBXSqliteDriver;dxBarDBNavRS29;DBXSybaseASEDriver;inetdbxpress;FireDAC;xmlrtl;dsnap;FireDACDb2Driver;dxPSdxLCLnkRS29;DBXOracleDriver;dclTMSQueryStudio;DatasnapConnectorsFreePascal;dxPSLnksRS29;dxPSdxOCLnkRS29;cxSchedulerGridRS29;X2IrisComponentsR;TMSLogging;sparkle;dxPSdxDBTVLnkRS29;sphinx;dxGaugeControlRS29;bindcompvclwinx;pcmsGeneral;dxOrgChartAdvancedCustomizeFormRS29;bindcompfmx;madBasic_;dxFlowChartLayoutsRS29;dxdborRS29;FireDACASADriver;Tee;dxPScxGridLnkRS29;vclactnband;TMSScripter;officeXPrt;FireDACInfxDriver;dxRichEditCoreRS29;DBXMySQLDriver;dxFlowChartAdvancedCustomizeFormRS29;VclSmp;DataSnapCommon;EurekaLogCore;dxPSTeeChartRS29;fmxase;dxFlowChartRS29;cxGridRS29;dxSpellCheckerRS29;DataSnapIndy10ServerTransport;dxMapControlRS29;vcldsnap;DBXInterBaseDriver;RosiUDB_FD_DX120;vcldb;cxSchedulerTreeBrowserRS29;dxTabbedMDIRS29;inetstn;OfficeViewer;dxHttpIndyRequestRS29;cxPivotGridOLAPRS29;RaizeComponentsVclDb;vcl;TMSScripter_Legacy;DataSnapClient;dxCoreRS29;IcsVclNewRun;dxSkinsCoreRS29;emsclientfiredac;FireDACPgDriver;FireDACDSDriver;tethering;bindcompvcl;CloudService;cxSchedulerRS29;RaizeComponentsVcl;dxPScxCommonRS29;soapserver;FireDACIBDriver;dxRibbonRS29;vclwinx;DataSnapServer;fmx;dxSpreadSheetReportDesignerRS29;DbxCommonDriver;VCLRESTComponents;FireDACCommonODBC;DBXMSSQLDriver;dxComnRS29;emsclient;dxFlowChartDesignerRS29;AbbreviaD;appanalytics;IndyProtocols;vclx;Skia.Package.RTL;dxBarExtDBItemsRS29;FmxTeeUI;cxFireDACAdaptersRS29;DBXFirebirdDriver;VclPrintDat;FireDACSqliteDriver;DbxClientDriver;soapmidas;TeeUI;Python;dxDockingRS29;AsyncProDR;RosiDBSorters_DX120;ipstudiowin;dxorgcRS29;fmxdae;dxPSRichEditControlLnkRS29;dxPSdxSpreadSheetLnkRS29;PKIEDB29;cxADOAdaptersRS29;TMSQueryStudio;dxPSPrVwRibbonRS29;IndySystem;RosiDBComp_DX120;dxPSdxDBOCLnkRS29;dxGDIPlusRS29;BlowfishD;dxPSCoreRS29;madDisAsm_;FireDACCommon;DataSnapServerMidas;dxPSdxMapControlLnkRS29;cxGridEMFRS29;dxGanttControlRS29;dxPScxPivotGridLnkRS29;dxADOServerModeRS29;dxWizardControlRS29;TMSScripter_VCL;bindcompdbx;FireDACMySQLDriver;dxCloudServiceLibraryRS29;remotedb;IcsCommonNewRun;TMSVCLUIPackPkgDXE15;TMSWEBCorePkgDXE15;dxSpreadSheetCoreRS29;dxNavBarRS29;vclimg;DataSnapFireDAC;pkVirtualUIR;dxFireDACEMFRS29;xdata;DBXInformixDriver;fmxobj;bindcompvclsmp;DataSnapNativeClient;dxmdsRS29;TMSScripter_Memo;dxPScxSchedulerLnkRS29;emshosting;dxADOEMFRS29;dxChartControlRS29;FireDACCommonDriver;IndyIPClient;dxPDFViewerRS29;emsedge;dxBarExtItemsRS29;SysToolsDBDR;uSynEdit_R2025;inetdb;cxPivotGridChartRS29;fmxFireDAC;cxTreeListdxBarPopupMenuRS29;cxSchedulerRibbonStyleEventEditorRS29;OnGuardDR;dxtrmdRS29;DBXOdbcDriver;dbrtl;dxPScxPCProdRS29;FireDACOracleDriver;Skia.Package.FMX;CodeSiteExpressPkg;uniGUI29m;TeeDB;FireDACMSAccDriver;AbbreviaVCLD;dxRichEditDocumentModelRS29;PKIECtrl29;DataSnapConnectors;FireDACMongoDBDriver;FireDACTDataDriver;cxLibraryRS29;ipstudiowinclient;Skia.Package.VCL;SynEditDR;dxPSdxPDFViewerLnkRS29;bindcomp;cxExportRS29;IndyCore;RESTBackendComponents;inetwinsockets;dxTileControlRS29;dxFireDACServerModeRS29;GigasoftD;FireDACADSDriver;RESTComponents;IndyIPServer;dsnapxml;adortl;dxdbtrRS29;dsnapcon;cxPivotGridRS29;DataSnapProviderClient;SAPTypeLibsUD;DBXDb2Driver;dxBarRS29;pkNativeXML;DBXSybaseASADriver;dxSpreadSheetConditionalFormattingDialogsRS29;cxTreeListRS29;FMXTee;TMSWEBCorePkgLibDXE15;soaprtl;dxDBXServerModeRS29;dxPSdxChartControlLnkRS29;$(DCC_UsePackage)</DCC_UsePackage>
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
         <BT_BuildType>Debug</BT_BuildType>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -82,13 +69,7 @@
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
-        <DCC_UsePackage>dxPScxCommonRS29;dxPSdxChartControlLnkRS29;dxRibbonRS29;vclwinx;DataSnapServer;dxPScxExtCommonRS29;dxRichEditControlCoreRS29;fmx;dxSpreadSheetReportDesignerRS29;vclie;DbxCommonDriver;bindengine;IndyIPCommon;VCLRESTComponents;DBXMSSQLDriver;FireDACCommonODBC;emsclient;dxComnRS29;dxFlowChartDesignerRS29;appanalytics;IndyProtocols;vclx;dxBarExtDBItemsRS29;dbxcds;vcledge;cxVerticalGridRS29;AbbreviaD;FmxTeeUI;cxFireDACAdaptersRS29;dxPSDBTeeChartRS29;cxSchedulerWebServiceStorageRS29;DBXFirebirdDriver;dxRichEditControlRS29;dxPsPrVwAdvRS29;FireDACSqliteDriver;DbxClientDriver;dxPSdxGaugeControlLnkRS29;soapmidas;dxRibbonCustomizationFormRS29;TeeUI;dbexpress;Python;dxEMFRS29;dxDockingRS29;inet;AsyncProDR;vcltouch;PythonVcl;ipstudiowin;dxPSdxFCLnkRS29;dxorgcRS29;FireDACDBXDriver;dxSpreadSheetCoreConditionalFormattingDialogsRS29;fmxdae;SysToolsDR;dxPSRichEditControlLnkRS29;dxPSdxSpreadSheetLnkRS29;CustomIPTransport;FireDACMSSQLDriver;PKIEDB29;cxADOAdaptersRS29;dxPSPrVwRibbonRS29;IndySystem;dxPScxTLLnkRS29;dxPSdxDBOCLnkRS29;dxGDIPlusRS29;VirtualTreesR;vclFireDAC;dxPSCoreRS29;dxSpreadSheetRS29;FireDACCommon;DataSnapServerMidas;FireDACODBCDriver;emsserverresource;cxGridEMFRS29;dxPSdxMapControlLnkRS29;dxGanttControlRS29;dxPScxVGridLnkRS29;dxPScxPivotGridLnkRS29;dxADOServerModeRS29;dxWizardControlRS29;bindcompdbx;rtl;FireDACMySQLDriver;dxCloudServiceLibraryRS29;dxServerModeRS29;DBXSqliteDriver;IcsCommonNewRun;dxBarDBNavRS29;DBXSybaseASEDriver;dxSpreadSheetCoreRS29;dxNavBarRS29;vclimg;DataSnapFireDAC;inetdbxpress;FireDAC;xmlrtl;dxFireDACEMFRS29;dsnap;FireDACDb2Driver;dxPSdxLCLnkRS29;DBXOracleDriver;DBXInformixDriver;fmxobj;bindcompvclsmp;DataSnapNativeClient;DatasnapConnectorsFreePascal;dxPSLnksRS29;dxmdsRS29;dxPSdxOCLnkRS29;cxSchedulerGridRS29;dxPScxSchedulerLnkRS29;emshosting;dxADOEMFRS29;dxChartControlRS29;dxPSdxDBTVLnkRS29;FireDACCommonDriver;dxGaugeControlRS29;IndyIPClient;dxPDFViewerRS29;bindcompvclwinx;dxOrgChartAdvancedCustomizeFormRS29;emsedge;bindcompfmx;dxBarExtItemsRS29;SysToolsDBDR;dxFlowChartLayoutsRS29;inetdb;dxdborRS29;FireDACASADriver;Tee;dxPScxGridLnkRS29;cxPivotGridChartRS29;vclactnband;fmxFireDAC;officeXPrt;FireDACInfxDriver;dxRichEditCoreRS29;cxTreeListdxBarPopupMenuRS29;DBXMySQLDriver;dxFlowChartAdvancedCustomizeFormRS29;VclSmp;cxSchedulerRibbonStyleEventEditorRS29;DataSnapCommon;OnGuardDR;dxPSTeeChartRS29;fmxase;EurekaLogCore;dxtrmdRS29;dxFlowChartRS29;DBXOdbcDriver;dbrtl;dxPScxPCProdRS29;FireDACOracleDriver;TeeDB;FireDACMSAccDriver;cxGridRS29;dxSpellCheckerRS29;AbbreviaVCLD;DataSnapIndy10ServerTransport;dxRichEditDocumentModelRS29;dxMapControlRS29;DataSnapConnectors;PKIECtrl29;vcldsnap;DBXInterBaseDriver;FireDACMongoDBDriver;FireDACTDataDriver;cxLibraryRS29;ipstudiowinclient;Skia.Package.VCL;vcldb;dxPSdxPDFViewerLnkRS29;cxSchedulerTreeBrowserRS29;bindcomp;dxTabbedMDIRS29;cxExportRS29;inetstn;IndyCore;RESTBackendComponents;dxHttpIndyRequestRS29;dxTileControlRS29;dxFireDACServerModeRS29;cxPivotGridOLAPRS29;FireDACADSDriver;RESTComponents;IndyIPServer;vcl;dsnapxml;adortl;dsnapcon;DataSnapClient;DataSnapProviderClient;dxCoreRS29;cxPivotGridRS29;dxdbtrRS29;IcsVclNewRun;DBXDb2Driver;dxSkinsCoreRS29;emsclientfiredac;FireDACPgDriver;FireDACDSDriver;dxBarRS29;tethering;bindcompvcl;CloudService;DBXSybaseASADriver;dxSpreadSheetConditionalFormattingDialogsRS29;cxTreeListRS29;FMXTee;soaprtl;dxDBXServerModeRS29;cxSchedulerRS29;soapserver;FireDACIBDriver;$(DCC_UsePackage)</DCC_UsePackage>
-        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
-        <BT_BuildType>Debug</BT_BuildType>
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
-        <VerInfo_Locale>1033</VerInfo_Locale>
-        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+        <DCC_UsePackage>dxPScxExtCommonRS29;dxRichEditControlCoreRS29;vclie;bindengine;IndyIPCommon;cxVerticalGridRS29;dbxcds;vcledge;dxPSDBTeeChartRS29;cxSchedulerWebServiceStorageRS29;dxRichEditControlRS29;dxPsPrVwAdvRS29;dxPSdxGaugeControlLnkRS29;TMSScripter_IDE;dxRibbonCustomizationFormRS29;dbexpress;dxEMFRS29;inet;PythonVcl;vcltouch;uniGUI29VCL;dxPSdxFCLnkRS29;FireDACDBXDriver;dxSpreadSheetCoreConditionalFormattingDialogsRS29;SysToolsDR;CustomIPTransport;FireDACMSSQLDriver;dxPScxTLLnkRS29;VirtualTreesR;vclFireDAC;dxSpreadSheetRS29;FireDACODBCDriver;emsserverresource;dxPScxVGridLnkRS29;rtl;dxServerModeRS29;DBXSqliteDriver;dxBarDBNavRS29;DBXSybaseASEDriver;inetdbxpress;FireDAC;xmlrtl;dsnap;FireDACDb2Driver;dxPSdxLCLnkRS29;DBXOracleDriver;dclTMSQueryStudio;DatasnapConnectorsFreePascal;dxPSLnksRS29;dxPSdxOCLnkRS29;cxSchedulerGridRS29;dxPSdxDBTVLnkRS29;dxGaugeControlRS29;bindcompvclwinx;dxOrgChartAdvancedCustomizeFormRS29;bindcompfmx;dxFlowChartLayoutsRS29;dxdborRS29;FireDACASADriver;Tee;dxPScxGridLnkRS29;vclactnband;TMSScripter;officeXPrt;FireDACInfxDriver;dxRichEditCoreRS29;DBXMySQLDriver;dxFlowChartAdvancedCustomizeFormRS29;VclSmp;DataSnapCommon;EurekaLogCore;dxPSTeeChartRS29;fmxase;dxFlowChartRS29;cxGridRS29;dxSpellCheckerRS29;DataSnapIndy10ServerTransport;dxMapControlRS29;vcldsnap;DBXInterBaseDriver;RosiUDB_FD_DX120;vcldb;cxSchedulerTreeBrowserRS29;dxTabbedMDIRS29;inetstn;dxHttpIndyRequestRS29;cxPivotGridOLAPRS29;vcl;TMSScripter_Legacy;DataSnapClient;dxCoreRS29;IcsVclNewRun;dxSkinsCoreRS29;emsclientfiredac;FireDACPgDriver;FireDACDSDriver;tethering;bindcompvcl;CloudService;cxSchedulerRS29;dxPScxCommonRS29;soapserver;FireDACIBDriver;dxRibbonRS29;vclwinx;DataSnapServer;fmx;dxSpreadSheetReportDesignerRS29;DbxCommonDriver;VCLRESTComponents;FireDACCommonODBC;DBXMSSQLDriver;dxComnRS29;emsclient;dxFlowChartDesignerRS29;AbbreviaD;appanalytics;IndyProtocols;vclx;dxBarExtDBItemsRS29;FmxTeeUI;cxFireDACAdaptersRS29;DBXFirebirdDriver;FireDACSqliteDriver;DbxClientDriver;soapmidas;TeeUI;Python;dxDockingRS29;AsyncProDR;RosiDBSorters_DX120;ipstudiowin;dxorgcRS29;fmxdae;dxPSRichEditControlLnkRS29;dxPSdxSpreadSheetLnkRS29;PKIEDB29;cxADOAdaptersRS29;TMSQueryStudio;dxPSPrVwRibbonRS29;IndySystem;RosiDBComp_DX120;dxPSdxDBOCLnkRS29;dxGDIPlusRS29;dxPSCoreRS29;FireDACCommon;DataSnapServerMidas;dxPSdxMapControlLnkRS29;cxGridEMFRS29;dxGanttControlRS29;dxPScxPivotGridLnkRS29;dxADOServerModeRS29;dxWizardControlRS29;TMSScripter_VCL;bindcompdbx;FireDACMySQLDriver;dxCloudServiceLibraryRS29;IcsCommonNewRun;TMSVCLUIPackPkgDXE15;TMSWEBCorePkgDXE15;dxSpreadSheetCoreRS29;dxNavBarRS29;vclimg;DataSnapFireDAC;dxFireDACEMFRS29;DBXInformixDriver;fmxobj;bindcompvclsmp;DataSnapNativeClient;dxmdsRS29;TMSScripter_Memo;dxPScxSchedulerLnkRS29;emshosting;dxADOEMFRS29;dxChartControlRS29;FireDACCommonDriver;IndyIPClient;dxPDFViewerRS29;emsedge;dxBarExtItemsRS29;SysToolsDBDR;uSynEdit_R2025;inetdb;cxPivotGridChartRS29;fmxFireDAC;cxTreeListdxBarPopupMenuRS29;cxSchedulerRibbonStyleEventEditorRS29;OnGuardDR;dxtrmdRS29;DBXOdbcDriver;dbrtl;dxPScxPCProdRS29;FireDACOracleDriver;uniGUI29m;TeeDB;FireDACMSAccDriver;AbbreviaVCLD;dxRichEditDocumentModelRS29;PKIECtrl29;DataSnapConnectors;FireDACMongoDBDriver;FireDACTDataDriver;cxLibraryRS29;ipstudiowinclient;Skia.Package.VCL;SynEditDR;dxPSdxPDFViewerLnkRS29;bindcomp;cxExportRS29;IndyCore;RESTBackendComponents;dxTileControlRS29;dxFireDACServerModeRS29;FireDACADSDriver;RESTComponents;IndyIPServer;dsnapxml;adortl;dxdbtrRS29;dsnapcon;cxPivotGridRS29;DataSnapProviderClient;DBXDb2Driver;dxBarRS29;DBXSybaseASADriver;dxSpreadSheetConditionalFormattingDialogsRS29;cxTreeListRS29;FMXTee;TMSWEBCorePkgLibDXE15;soaprtl;dxDBXServerModeRS29;dxPSdxChartControlLnkRS29;$(DCC_UsePackage)</DCC_UsePackage>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
@@ -105,10 +86,6 @@
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <DCC_UsePackage>X2IrisComponentsR;$(DCC_UsePackage)</DCC_UsePackage>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
-        <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -119,56 +96,57 @@
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
-        <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
-    </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="main.pas">
+        <DCCReference Include="ServerModule.pas">
+            <Form>UniServerModule</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TUniGUIServerModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="MainModule.pas">
+            <Form>UniMainModule</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TUniGUIMainModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="Main.pas">
             <Form>MainForm</Form>
-        </DCCReference>
-        <DCCReference Include="loginform.pas">
-            <Form>frmLogin</Form>
-        </DCCReference>
-        <DCCReference Include="SysTools.pas">
-            <Form>SysToolsFrm</Form>
-        </DCCReference>
-        <DCCReference Include="dideactions.pas">
-            <Form>dmIDEActions</Form>
-            <DesignClass>TDataModule</DesignClass>
-        </DCCReference>
-        <DCCReference Include="fIDEEditor.pas">
-            <Form>IDEEditorForm</Form>
-        </DCCReference>
-        <DCCReference Include="IDERegDBPalette.pas"/>
-        <DCCReference Include="ap_X2IrisQuery.pas"/>
-        <DCCReference Include="ClassExplorerFrme.pas">
-            <Form>ClassExplorerFrame</Form>
             <FormType>dfm</FormType>
-            <DesignClass>TFrame</DesignClass>
+            <DesignClass>TUniForm</DesignClass>
         </DCCReference>
-        <DCCReference Include="FormsBindingForm.pas">
-            <Form>FormsBindingFrm</Form>
+        <DCCReference Include="PersonFrame.pas">
+            <Form>PersonFrme</Form>
             <FormType>dfm</FormType>
+            <DesignClass>TUniFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="ClassExplorerForm.pas">
-            <Form>ClassExplorerFrm</Form>
+        <DCCReference Include="ModuleRegistry.pas"/>
+        <DCCReference Include="EmployeeFrame.pas">
+            <Form>EmployeeFrme</Form>
             <FormType>dfm</FormType>
+            <DesignClass>TUniFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="ClassEditorForm.pas">
-            <Form>ClassEditorFrm</Form>
+        <DCCReference Include="CompanyFrame.pas">
+            <Form>CompanyFrme</Form>
             <FormType>dfm</FormType>
+            <DesignClass>TUniFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="PermissionsForm.pas">
-            <Form>PermissionsFrm</Form>
+        <DCCReference Include="PersonDictForm.pas">
+            <Form>PersonDictFrm</Form>
             <FormType>dfm</FormType>
+            <DesignClass>TUniForm</DesignClass>
         </DCCReference>
-        <DCCReference Include="X2RoleForm.pas">
-            <Form>X2RoleFrm</Form>
+        <DCCReference Include="uFilterDialog.pas">
+            <Form>frmFilter</Form>
             <FormType>dfm</FormType>
+            <DesignClass>TUniForm</DesignClass>
         </DCCReference>
+        <DCCReference Include="NavigatorFrame.pas">
+            <Form>NavigatorFrme</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TUniFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="uClientTracker.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -187,7 +165,7 @@
         <BorlandProject>
             <Delphi.Personality>
                 <Source>
-                    <Source Name="MainSource">IrisClient.dpr</Source>
+                    <Source Name="MainSource">IrisWebClient.dpr</Source>
                 </Source>
                 <Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dipstudiowin290.bpl">Woll2Woll InfoPower 4K Athens</Excluded_Packages>
@@ -202,9 +180,9 @@
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="5">
-                <DeployFile LocalName="Win32\Debug\IrisClient.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="Win32\Debug\IrisWebClient.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteName>IrisClient.exe</RemoteName>
+                        <RemoteName>IrisWebClient.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -1151,9 +1129,8 @@
             </Deployment>
             <Platforms>
                 <Platform value="Win32">True</Platform>
-                <Platform value="Win64">True</Platform>
+                <Platform value="Win64">False</Platform>
             </Platforms>
-            <ModelSupport>False</ModelSupport>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>
     </ProjectExtensions>

@@ -13,8 +13,9 @@ uses
   {$ENDIF}
   fObjectInspector, fWatches,
   *)
-  atScripter, ScrMemo, System.ImageList, System.Actions, main, ClassExplorerForm,
-  Vcl.BaseImageCollection, Vcl.ImageCollection, Vcl.VirtualImageList;
+  atScripter, ScrMemo, System.ImageList, System.Actions,
+  Vcl.BaseImageCollection, Vcl.ImageCollection, Vcl.VirtualImageList,
+  ClassExplorerForm;
 
 type
   TLastSearchMode = (lsNone, lsFind, lsReplace);
@@ -75,6 +76,7 @@ type
     VirtualImageList1: TVirtualImageList;
     ActionList2: TActionList;
     acClassExplorer: TAction;
+    acPermissions: TAction;
     procedure acNewPascalUnitExecue(Sender: TObject);
     procedure acNewFormExecute(Sender: TObject);
     procedure acOpenFileExecute(Sender: TObject);
@@ -139,6 +141,7 @@ type
     procedure acCompileExecute(Sender: TObject);
     procedure acClassExplorerExecute(Sender: TObject);
     procedure ActionList2Update(Action: TBasicAction; var Handled: Boolean);
+    procedure acPermissionsExecute(Sender: TObject);
   private
     FEngine: TIDEEngine;
     FLastSearch: TLastSearchMode;
@@ -169,7 +172,7 @@ var
   dmIDEActions: TdmIDEActions;
 
 implementation
-uses Clipbrd;
+uses Clipbrd, PermissionsForm, main;
 
 {$R *.DFM}
 
@@ -818,6 +821,13 @@ begin
     FClassExplorer.UpdateActions;
 end;
 
+procedure TdmIDEActions.acPermissionsExecute(Sender: TObject);
+begin
+  with TPermissionsFrm.Create(nil) do begin
+    ShowModal;
+    Free;
+  end;
+end;
 
 
 

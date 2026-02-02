@@ -34,18 +34,20 @@ type
 
 implementation
 
-uses main;
+uses main, X2IrisQuery;
 
 {$R *.dfm}
 //{$I const.inc}
 
 procedure TfrmLogin.btnOKClick(Sender: TObject);
+var
+  Namespace: string;
 begin
-  with MainForm, BaseAuthenticator, ClassExplorer.qryX2IrisQuery do begin
+  with MainForm, BaseAuthenticator do begin
     Username := Trim(edUsername.Text);
     Password := Trim(edPassword.Text);
     Namespace := Trim(lcNamespaces.Items.Strings[lcNamespaces.ItemIndex]);
-    RestClient := MainForm.RESTClient;
+    RegisterDefaultRestClientAndNamespace(RESTClient, Namespace);
     ClassExplorer.InitDBTree;
     with FIniFile do begin
       if chkRememberParams.Checked then begin

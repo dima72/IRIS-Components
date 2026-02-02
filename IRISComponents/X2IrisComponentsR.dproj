@@ -98,6 +98,7 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="X2IrisQuery.pas"/>
+        <DCCReference Include="uCheckError.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

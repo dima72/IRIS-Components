@@ -13,7 +13,9 @@ uses
   ClassExplorerFrme in 'ClassExplorerFrme.pas' {ClassExplorerFrame: TFrame},
   FormsBindingForm in 'FormsBindingForm.pas' {FormsBindingFrm},
   ClassExplorerForm in 'ClassExplorerForm.pas' {ClassExplorerFrm},
-  ClassEditorForm in 'ClassEditorForm.pas' {ClassEditorFrm};
+  ClassEditorForm in 'ClassEditorForm.pas' {ClassEditorFrm},
+  PermissionsForm in 'PermissionsForm.pas' {PermissionsFrm},
+  X2RoleForm in 'X2RoleForm.pas' {X2RoleFrm};
 
 {$R *.res}
 var
@@ -31,6 +33,8 @@ begin
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TMainForm, MainForm);
   Application.CreateForm(TdmIDEActions, dmIDEActions);
+  Application.CreateForm(TPermissionsFrm, PermissionsFrm);
+  Application.CreateForm(TX2RoleFrm, X2RoleFrm);
   Application.Run;
   if Mutex <> 0 then
     CloseHandle(Mutex);
