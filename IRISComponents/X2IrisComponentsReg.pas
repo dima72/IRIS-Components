@@ -6,7 +6,7 @@ unit X2IrisComponentsReg;
 }
 
 interface
-uses System.Classes, X2IrisQuery, CustomDebugDialog;
+uses System.Classes, X2IrisQuery;
 
 procedure Register;
 
@@ -15,7 +15,7 @@ implementation
 procedure Register;
 begin
   RegisterComponents('IRIS', [TX2IrisQuery]);
-  RegisterClasses([TfrmCustomDebug]);
+//  RegisterClasses([TfrmCustomDebug]);
 end;
 
 

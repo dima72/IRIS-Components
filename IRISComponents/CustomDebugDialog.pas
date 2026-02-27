@@ -1,9 +1,10 @@
 unit CustomDebugDialog;
 
 interface
+{$IFDEF MSWINDOWS}
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls;
 
 type
@@ -23,7 +24,9 @@ procedure ShowDebugMessage(const Msg: string; const Title: string = 'Debug Infor
 
 var
   frmCustomDebug: TfrmCustomDebug;
+{$ENDIF}
 implementation
+{$IFDEF MSWINDOWS}
 
 {$R *.dfm}
 
@@ -52,6 +55,6 @@ begin
   end;
 end;
 
-
+{$ENDIF}
 end.
 

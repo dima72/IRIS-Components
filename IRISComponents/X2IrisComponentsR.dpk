@@ -30,19 +30,21 @@ package X2IrisComponentsR;
 
 requires
   rtl,
-  vcl,
   dbrtl,
   bindengine,
   RESTComponents,
   bindcomp,
   FireDAC,
   FireDACCommonDriver,
-  FireDACCommon,
-  vclx;
+  FireDACCommon
+ {$IFDEF MSWINDOWS}
+  ,vcl
+  {$ENDIF}
+  ;
 
 contains
-  CustomDebugDialog in 'CustomDebugDialog.pas' {frmCustomDebug},
   X2IrisQuery in 'X2IrisQuery.pas',
-  uCheckError in 'uCheckError.pas';
+  uCheckError in 'uCheckError.pas',
+  CustomDebugDialog in 'CustomDebugDialog.pas' {frmCustomDebug};
 
 end.

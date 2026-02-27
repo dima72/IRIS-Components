@@ -135,7 +135,7 @@ ClassMethod ObjectExists(metaobjects As %Collection.ListOfObj, ColumnName As %St
 */
 ClassMethod RunSQL() As %Status
 {
-    
+        
     $$$CheckError($iso(%request.Content) = 1, "%request.Content is empty")   
     Set body = %request.Content.Read() 
       
@@ -149,9 +149,10 @@ ClassMethod RunSQL() As %Status
     Zn input.namespace
 
     Set tSQL = input.sql
+    
       
     //Zn "CLIENTAPP"   
-    //Set tSQL = "SELECT ID, Name, Spouse FROM ONAPI.Person"
+    //Set tSQL = "SELECT TOP 1 ID, Spouse->Name as SpouseName  FROM ONAPI.Employee"
     
     SET stmt = ##class(%SQL.Statement).%New()    
     //Set tSQL = "CALL X2IrisClient.SP_ClassTree('%SYS')"
@@ -187,7 +188,7 @@ ClassMethod RunSQL() As %Status
           set col.OAllowNull = "BooleanTrue"
           set col.OInUpdate = "BooleanTrue"
           set col.OInWhere = "BooleanTrue"
-          set col.OriginColName = column.colName
+          set col.OriginColName = column.colName                    
           do cols.%Push(col)                
           continue
       }
@@ -322,15 +323,35 @@ ClassMethod RunSQL() As %Status
       set col.OAllowNull = "BooleanTrue"
       set col.OInUpdate = "BooleanTrue"
       set col.OInWhere = "BooleanTrue"
-      set col.OriginColName = col.Name
+      if column.isAliased {
+        set col.OriginColName = column.property.Name
+      } else {
+        set col.OriginColName = column.colName
+      }
 
-      // Check if this column is a property reference
-      Set IsPropertyReference =  ..IsReferenceProperty(column.property.parent.Name, column.colName)  // ..ObjectExists(metaobjects, column.colName)
+      Set t = column.typeClass
 
-      if (IsPropertyReference = 0) && (col.DataType '= "WideMemo") && (col.DataType '= "Blob"){
+      If t = "" {
+            // very old/odd cases – treat as scalar
+            Set isRef = 0
+      } ElseIf t.ClassType = "persistent" {
+            // persistent class → reference property
+            Set isRef = 1
+      } Else {
+            Set isRef = 0
+      }
+      /*
+       need to test if type is persistent class to identify
+      Set t = column.typeClass
+      If t="" Quit 0
+      Set ct = $Get(##class(%Dictionary.CompiledClass).%OpenId(t).ClassType)
+      Quit (ct="persistent") || (ct="serial")
+      */
+      
+      if (isRef = 0) && (col.DataType '= "WideMemo") && (col.DataType '= "Blob"){
         set col.SourceSize = col.Size
       }
-      if IsPropertyReference {
+      if isRef {
         set col.DataType = "Int32" 
         set col.Searchable = "BooleanTrue"
         set col.AllowNull = "BooleanTrue"
@@ -342,7 +363,7 @@ ClassMethod RunSQL() As %Status
       } 
       
       do cols.%Push(col)
-  }
+    }
     do ..SortColumns(cols)
     //important if there are duplicates in columns
     do ..ResolveDuplicateNames(cols)
@@ -395,13 +416,14 @@ ClassMethod RunSQL() As %Status
 Set colValue =  $REPLACE(text, """", """""")   
                 */
                 Set colValue = "Not implemented.To read WideMemo/Blob properties, modify RESTServer.RunSQL method."
-            }elseif colDataType = "Boolean" {
+            }
+            elseif colDataType = "Boolean" {
                 if colValue=1 {
                     set colValue = "BooleanTrue"
                 }else {
                     set colValue = "BooleanFalse"
                 }
-}
+            }
             elseif colName = "ID" {
               // ID is always integer
               Set colValue = +colValue
@@ -604,6 +626,20 @@ ClassMethod IsReferenceProperty(class As %String, propName As %String) As %Boole
     Quit 1
 }
 
+ClassMethod GetCompiledProperty(className As %String, propName As %String) As %Dictionary.CompiledProperty
+{
+    Set class = ##class(%Dictionary.CompiledClass).%OpenId(className)
+    $$$CheckError(class '= "", "Class "_className_" not found in %Dictionary")
+    If class = "" Quit ""
+
+    For i=1:1:class.Properties.Count() {
+        Set p = class.Properties.GetAt(i)
+        If p.Name = propName Return p
+    }
+
+    Quit ""
+}
+
 ClassMethod PostObject() As %Status
 {
     Set response = {}
@@ -613,7 +649,7 @@ ClassMethod PostObject() As %Status
         Set body = %request.Content.Read()
         Set input = {}.%FromJSON(body)
         
-        //Set input = {"class":"X2IrisClient.Security.Permission","operation":"insert","data":{"ID":"","X2Role":"1","RoleName":"","TargetClass":"ONAPI.Person","Action":"READ"}}
+        //Set input = {"class":"ONAPI.Person","operation":"edit","data":{"ID":"1","Name":"Eastman,Lola I.ww","DOB":"11\/23\/1960"}}
         Set className = input.class
         $$$CheckError(className '= "", "class is empty")
 
@@ -644,25 +680,18 @@ ClassMethod PostObject() As %Status
         Set iterator = data.%GetIterator()
         While iterator.%GetNext(.key, .value) {
             Continue:key="ID"  // skip ID
-
-            Set prop = ##class(%Dictionary.PropertyDefinition).%OpenId(className_"||"_key)
-            If prop = "" Continue  // property does not exist
-
-            If ..IsReferenceProperty(className, key) {
-                // Get the declared type of the property
-
-                Set type = prop.Type
-                If type = "" Continue // should never happen, but safe
-                // Check if type is a class (not a datatype)
-                If '##class(%Dictionary.ClassDefinition).%ExistsId(type) Continue
-                //Open the referenced object by ID
-                
-                 //"X2IrisClient.Security.X2Role"
-                Set refObj = $classmethod(type, "%OpenId", value)
+                                    
+            Set prop = ..GetCompiledProperty(className, key)
+            $$$CheckError(prop '= "", "Property "_key_" not found")
+                        
+            If (prop.Type '= "") && ($Extract(prop.Type,1) '= "%") {
+                // Get the declared type of the property                
+                 
+                Set refObj = $classmethod(prop.Type, "%OpenId", value)
                 Set $PROPERTY(obj, key) = refObj
                 Continue
             }
-
+            
              // Determine property type without %Dictionary            
             // Stream property?
             

@@ -12,9 +12,10 @@ uses
   System.SysUtils, System.Classes, System.Generics.Collections, Data.DB,
   FireDAC.Comp.DataSet, FireDAC.Comp.Client, REST.Types, REST.Client,
   REST.Response.Adapter, System.JSON, FireDAC.Stan.Intf, FireDAC.Stan.StorageJSON,
-  Vcl.Dialogs;
+  FireDAC.Stan.Param;
 
 type
+  [ComponentPlatformsAttribute(pidWin32 or pidWin64 or pidLinux64)] //  [ComponentPlatformsAttribute(pidAllPlatforms)]
   TX2IrisQuery = class(TFDCustomMemTable)
   private
     FRestClient: TRESTClient;
@@ -31,6 +32,8 @@ type
     FLastState: TDataSetState;
     FOriginalValues: TDictionary<string,string>;
     FOnHTTPProtocolError: TCustomRESTRequestNotifyEvent;
+    FParams: TFDParams;
+    FOnBeforeOpen: TDataSetNotifyEvent;
     procedure SetRestClient(ARestClient: TRESTClient);
     procedure SetSQL(ASQL: TStrings);
     procedure SQLChanged(Sender: TObject);
@@ -46,6 +49,8 @@ type
     procedure DoAfterPost; override;
     procedure DoBeforeEdit; override;
     procedure DoBeforeDelete; override;
+    procedure DoBeforeOpen; override;
+    function GetParams: TFDParams; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -56,6 +61,7 @@ type
     procedure Open; overload;
     procedure Close;
     property RestResponse: TRESTResponse read FRestResponse;
+    procedure ShowDebugMessage(const Msg: string; const Title: string = 'Debug Information');
   published
     property RestClient: TRESTClient read FRestClient write SetRestClient;
     property Active: Boolean read FDatasetOpened write SetActive2;
@@ -63,12 +69,14 @@ type
     property Namespace: string read FNamespace write FNamespace;
     property IrisClass: string read FIrisClass write FIrisClass;
     property OnHTTPProtocolError: TCustomRESTRequestNotifyEvent read FOnHTTPProtocolError write FOnHTTPProtocolError;
+    property OnBeforeOpen: TDataSetNotifyEvent read FOnBeforeOpen write FOnBeforeOpen;
   end;
   procedure CheckError(ATrue: Boolean; AMessage: string);
   function NormalizeScript(AScript: string): string;
   function Fetch(var AStr: string; ADelimiter: string): string;
 
   procedure RegisterDefaultRestClientAndNamespace(ARestClient: TRestClient; ANamespace: string);
+
 const
   NamespacesScript =
   'Set stmt = ##class(%SQL.Statement).%New() ' +
@@ -81,9 +89,9 @@ const
   'Quit out';
 
 implementation
-
-uses CustomDebugDialog;
-
+  {$IFDEF MSWINDOWS}
+  uses Winapi.Windows, CustomDebugDialog;
+  {$ENDIF}
 var
   GRestClient: TRestClient;
   GNamespace: string;
@@ -147,11 +155,28 @@ end;
 
 { TX2IrisQuery }
 
+
+procedure TX2IrisQuery.ShowDebugMessage(const Msg: string; const Title: string = 'Debug Information');
+begin
+  if (csDesigning in ComponentState) then begin
+  {$IFDEF MSWINDOWS}
+    CustomDebugDialog.ShowDebugMessage(Msg, Title);
+    Exit;
+  {$ENDIF}
+  end;
+  raise Exception.Create(Title + ' : ' + Msg);
+end;
+
 procedure TX2IrisQuery.Close;
 begin
   inherited Close;
   FDatasetOpened := False;
   FieldDefs.Clear;
+end;
+
+function TX2IrisQuery.GetParams: TFDParams;
+begin
+  Result := FParams;
 end;
 
 constructor TX2IrisQuery.Create(AOwner: TComponent);
@@ -164,12 +189,14 @@ begin
   FSQL := TStringList.Create;
   (FSQL as TStringList).OnChange := SQLChanged;
   FOriginalValues := TDictionary<string,string>.Create;
+  FParams := TFDParams.Create;
 end;
 
 destructor TX2IrisQuery.Destroy;
 begin
   FSQL.Free;
   FOriginalValues.Free;
+  FParams.Free;
   inherited;
 end;
 
@@ -265,7 +292,8 @@ begin
       CheckError(FRestResponse.StatusCode <= 400, 'REST Error');
       SS := TStringStream.Create(FRestResponse.Content, TEncoding.UTF8);
       //debug only
-      SS.SaveToFile('responce.json');
+      //SS.SaveToFile('responce.json');
+      SS.Position := 0;
       LoadFromStream(SS, sfJSON);
       FieldDefs.Update;
       FDatasetOpened := True;
@@ -338,6 +366,9 @@ var
 begin
   Result := TJSONObject.Create;
   for f in Fields do begin
+    //lookup fields are not persistent
+    if f.FieldKind = fkLookup then continue;
+    if f.Origin <> f.FullName then continue;
     if AChangedValues then begin
       if f is TMemoField then begin
          mf := f as TMemoField;
@@ -404,6 +435,13 @@ begin
   end;
 end;
 
+procedure TX2IrisQuery.DoBeforeOpen;
+begin
+  if Assigned(FOnBeforeOpen) then
+    FOnBeforeOpen(Self);
+  inherited;
+end;
+
 procedure TX2IrisQuery.DoBeforePost;
 begin
   inherited;
@@ -458,6 +496,14 @@ begin
       JSONObject.AddPair('data', DataObj);
       FRestRequest.ClearBody;
       var L := JSONObject.ToJSON;
+
+      //debug
+      with TStringList.Create do begin
+        Text := L;
+        SaveToFile('D:\Projects\GitHubRepo\IrisWebClient\src\bin\post.json');
+        Free;
+      end;
+
       FRestRequest.AddBody(JSONObject.ToJSON, ctAPPLICATION_JSON);
       FRestRequest.OnHTTPProtocolError := OnHTTPProtocolError;
       // Execute
