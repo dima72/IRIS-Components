@@ -23,6 +23,7 @@ package X2IrisComponentsR;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
+{$DEFINE MSWINDOWS}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
 {$RUNONLY}
@@ -36,11 +37,8 @@ requires
   bindcomp,
   FireDAC,
   FireDACCommonDriver,
-  FireDACCommon
- {$IFDEF MSWINDOWS}
-  ,vcl
-  {$ENDIF}
-  ;
+  FireDACCommon,
+  vcl;
 
 contains
   X2IrisQuery in 'X2IrisQuery.pas',

@@ -235,6 +235,8 @@ ClassMethod RunSQL() As %Status
           set col.DataType = "AnsiString"                              
           if MaxLen '= "" {
              set col.Size = +MaxLen // maxLength + 0 to convert to number
+          } else {
+             set col.Size = 255  // default size for strings without MAXLEN
           }
           
       }
@@ -324,7 +326,11 @@ ClassMethod RunSQL() As %Status
       set col.OInUpdate = "BooleanTrue"
       set col.OInWhere = "BooleanTrue"
       if column.isAliased {
-        set col.OriginColName = column.property.Name
+        if $iso(column.property) {
+          set col.OriginColName = column.property.Name
+        } else {
+          set col.OriginColName = column.colName  // for system columns like %ClassName
+        }
       } else {
         set col.OriginColName = column.colName
       }
@@ -707,7 +713,13 @@ ClassMethod PostObject() As %Status
         }
 
         // Save
-        Do obj.%Save()
+        Set sc = obj.%Save()
+        If $$$ISERR(sc) {
+            Do response.%Set("Result", -1)
+            Do response.%Set("error", $System.Status.GetErrorText(sc))
+            Write response.%ToJSON()
+            Return $$$OK  // Always return OK to avoid IRIS error output
+        }
 
         // Return new ID
         Do response.%Set("Result", obj.%Id())
@@ -718,7 +730,7 @@ ClassMethod PostObject() As %Status
         Do response.%Set("Result", -1)
         Do response.%Set("error", ex.DisplayString())
         Write response.%ToJSON()
-        return $$$ERROR($System.Status.Error(500,"PostObject failed"))
+        return $$$OK  // Always return OK
     }
 }
 

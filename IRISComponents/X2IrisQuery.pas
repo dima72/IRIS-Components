@@ -67,7 +67,6 @@ type
     property Active: Boolean read FDatasetOpened write SetActive2;
     property SQL: TStrings read FSQL write SetSQL;
     property Namespace: string read FNamespace write FNamespace;
-    property IrisClass: string read FIrisClass write FIrisClass;
     property OnHTTPProtocolError: TCustomRESTRequestNotifyEvent read FOnHTTPProtocolError write FOnHTTPProtocolError;
     property OnBeforeOpen: TDataSetNotifyEvent read FOnBeforeOpen write FOnBeforeOpen;
   end;
@@ -145,7 +144,7 @@ begin
   j := TJSONObject.ParseJSONValue(JsonText) as TJSONObject;
   try
     j.TryGetValue<string>('error', Err);
-    CheckError(Err = '', 'ExtractResult: ' + Err);
+    CheckError(Err = '', Err);
     Result := j.GetValue<string>('Result');
   finally
     j.Free;
@@ -158,12 +157,11 @@ end;
 
 procedure TX2IrisQuery.ShowDebugMessage(const Msg: string; const Title: string = 'Debug Information');
 begin
-  if (csDesigning in ComponentState) then begin
   {$IFDEF MSWINDOWS}
     CustomDebugDialog.ShowDebugMessage(Msg, Title);
-    Exit;
+  {$ELSE}
+    OutputDebugString(PChar(Title + ' : ' + Msg));
   {$ENDIF}
-  end;
   raise Exception.Create(Title + ' : ' + Msg);
 end;
 
@@ -275,26 +273,35 @@ begin
   CheckError(not FSQL.IsEmpty, 'Property SQL - text is Empty');
 
   FDatasetOpened := False;
+  FIrisClass := '';
   // Configure POST request
   FRestRequest.Method := rmPOST;
   FRestRequest.Resource := 'query';
   SS := nil;
   JSONObject := nil;
   try
+    JSONObject := TJSONObject.Create;
     try
-      JSONObject := TJSONObject.Create;
       JSONObject.AddPair('sql', Trim(FSQL.Text));
       JSONObject.AddPair('namespace', Trim(FNamespace));
       FRestRequest.ClearBody;
       FRestRequest.AddBody(JSONObject.ToJSON, ctAPPLICATION_JSON);
       FRestRequest.OnHTTPProtocolError := OnHTTPProtocolError;
       FRestRequest.Execute;
-      CheckError(FRestResponse.StatusCode <= 400, 'REST Error');
+      CheckError((FRestResponse.StatusCode >= 200) and (FRestResponse.StatusCode <= 299), 'REST Error');
       SS := TStringStream.Create(FRestResponse.Content, TEncoding.UTF8);
       //debug only
       //SS.SaveToFile('responce.json');
       SS.Position := 0;
       LoadFromStream(SS, sfJSON);
+      var IdField := FindField('ID');
+      if Assigned(IdField) then
+        IdField.ReadOnly := True;
+      var ClassField := FindField('__class');
+      if Assigned(ClassField) then begin
+        FIrisClass := ClassField.AsString;
+        ClassField.DisplayWidth := 50;
+      end;
       FieldDefs.Update;
       FDatasetOpened := True;
     finally
@@ -305,7 +312,7 @@ begin
     on E: Exception do begin
       ShowDebugMessage('TX2IrisQuery.Open: Exception: ' + E.Message + '. StatusCode: ' +
         IntToStr(FRestResponse.StatusCode) + ' Content: ' + FRestResponse.Content);
-      Abort;
+      raise;
     end;
   end;
 end;
@@ -340,7 +347,7 @@ begin
       FRestRequest.OnHTTPProtocolError := OnHTTPProtocolError;
       // Execute
       FRestRequest.Execute;
-      CheckError(FRestResponse.StatusCode <= 400, 'REST Error');
+      CheckError((FRestResponse.StatusCode >= 200) and (FRestResponse.StatusCode <= 299), 'REST Error');
        // ShowMessage('Got Responce');
       Result:= FRestResponse.Content;
     finally
@@ -352,7 +359,7 @@ begin
        'StatusText: ' + FRestResponse.StatusText + #13#10 +
        'StatusCode: ' + IntToStr(FRestResponse.StatusCode) + #13#10 +
        FRestResponse.Content, 'Debug');
-      Abort;
+      raise;
     end;
   end;
 end;
@@ -368,7 +375,12 @@ begin
   for f in Fields do begin
     //lookup fields are not persistent
     if f.FieldKind = fkLookup then continue;
-    if f.Origin <> f.FullName then continue;
+    //if f.Origin <> f.FullName then continue;
+    if f.FieldKind = fkCalculated then continue;
+    // Skip system fields starting with __ (e.g., __class)
+    if f.FieldName.StartsWith('__') then continue;
+    // Skip ID field for inserts if it's empty
+    if not AChangedValues and SameText(f.FieldName, 'ID') and (f.AsString = '') then continue;
     if AChangedValues then begin
       if f is TMemoField then begin
          mf := f as TMemoField;
@@ -381,13 +393,32 @@ begin
             Result.AddPair(wf.FieldName, wf.AsWideString);
       end
       else if f is TBlobField then begin
-         CheckError(false, 'TBlobField not implemented');
+        // Log warning or skip
+        ShowDebugMessage('TBlobField not supported for field: ' + f.FieldName);
+        Continue;
       end
-      else if SameText(f.FieldName, 'ID') or (Trim(FOriginalValues[f.FieldName]) <> Trim(f.AsString)) then begin
-        if f is TBooleanField then
-          Result.AddPair(f.FieldName, IntToStr(Ord((f as TBooleanField).Value)))
+      else if SameText(f.FieldName, 'ID') then begin
+        if f is TBooleanField then begin
+          if (f as TBooleanField).Value then
+            Result.AddPair(f.FieldName, 'BooleanTrue')
+          else
+            Result.AddPair(f.FieldName, 'BooleanFalse');
+        end
         else
           Result.AddPair(f.FieldName, f.AsString);
+      end
+      else begin
+        var OrigValue: string;
+        if FOriginalValues.TryGetValue(f.FieldName, OrigValue) and (Trim(OrigValue) <> Trim(f.AsString)) then begin
+          if f is TBooleanField then begin
+            if (f as TBooleanField).Value then
+              Result.AddPair(f.FieldName, 'BooleanTrue')
+            else
+              Result.AddPair(f.FieldName, 'BooleanFalse');
+          end
+          else
+            Result.AddPair(f.FieldName, f.AsString);
+        end;
       end;
     end
     else begin
@@ -451,6 +482,8 @@ begin
 end;
 
 procedure TX2IrisQuery.DoAfterPost;
+var
+  IdField: TField;
 begin
   inherited;
   if FLastState = dsEdit then Exit;
@@ -458,10 +491,16 @@ begin
   // Update the ID field WITHOUT triggering another POST
   FInInternalUpdate := True;
   try
-    if Assigned(FindField('ID')) then begin
+    IdField := FindField('ID');
+    if Assigned(IdField) then begin
       Edit;
-      FieldByName('ID').AsString := FNewID;
-      Post;
+      IdField.ReadOnly := False; // Temporarily allow editing
+      try
+        IdField.AsString := FNewID;
+        Post;
+      finally
+        IdField.ReadOnly := True; // Restore read-only after update
+      end;
     end;
   finally
     FInInternalUpdate := False;
@@ -471,10 +510,12 @@ end;
 function TX2IrisQuery.PostObjectAndGetID(AOperation: TDataSetState): string;
 var
   JSONObject, DataObj: TJSONObject;
+  JsonToPost: string;
 begin
   CheckRestClientAndNamespace;
   CheckError(Assigned(FRestClient), 'RestClient is not assigned');
-  CheckError(FIrisClass <> '', 'IrisClass property is Empty');
+  CheckError(FIrisClass <> '', 'The DataSet is ReadOnly. Make sure SELECT statement to have ''%ClassName As __class'' field');
+  JsonToPost := '';
   try
     FRestRequest.Method := rmPOST;
     FRestRequest.Resource := 'post';
@@ -495,31 +536,25 @@ begin
       CheckError(Assigned(DataObj), 'DataObj = nil');
       JSONObject.AddPair('data', DataObj);
       FRestRequest.ClearBody;
-      var L := JSONObject.ToJSON;
-
-      //debug
-      with TStringList.Create do begin
-        Text := L;
-        SaveToFile('D:\Projects\GitHubRepo\IrisWebClient\src\bin\post.json');
-        Free;
-      end;
+      JsonToPost := JSONObject.ToJSON;
 
       FRestRequest.AddBody(JSONObject.ToJSON, ctAPPLICATION_JSON);
       FRestRequest.OnHTTPProtocolError := OnHTTPProtocolError;
       // Execute
       FRestRequest.Execute;
-      CheckError(FRestResponse.StatusCode <= 400, 'PostObjectAndGetID. REST Error');
+      CheckError((FRestResponse.StatusCode >= 200) and (FRestResponse.StatusCode <= 299), 'PostObjectAndGetID. REST Error');
       Result:= ExtractResult(FRestResponse.Content);
     finally
       JSONObject.Free;
     end;
   except on
     E: Exception do begin
-      ShowDebugMessage('TX2IrisQuery.PostObjectAndGetID. Exception:' + E.Message + #13#10 +
-       'StatusText: ' + FRestResponse.StatusText + #13#10 +
-       'StatusCode: ' + IntToStr(FRestResponse.StatusCode) + #13#10 +
-       FRestResponse.Content, 'Debug');
-      Abort;
+      ShowDebugMessage('TX2IrisQuery.PostObjectAndGetID. Posting JSON: ' +
+      JsonToPost + #13#10 + 'Exception: ' + E.Message + #13#10 +
+      'StatusText: ' + FRestResponse.StatusText + #13#10 +
+      'StatusCode: ' + IntToStr(FRestResponse.StatusCode) + #13#10 +
+      FRestResponse.Content, 'Debug');
+      raise;
     end;
   end;
 end;
@@ -531,7 +566,7 @@ var
 begin
   CheckRestClientAndNamespace;
   CheckError(Assigned(FRestClient), 'RestClient is not assigned');
-  CheckError(FIrisClass <> '', 'IrisClass property is Empty');
+  CheckError(FIrisClass <> '', 'The DataSet is ReadOnly. Make sure SELECT statement to have ''%ClassName As __class'' field');
   try
     FRestRequest.Method := rmPOST;
     FRestRequest.Resource := 'delete';
@@ -545,7 +580,7 @@ begin
       FRestRequest.OnHTTPProtocolError := OnHTTPProtocolError;
       // Execute
       FRestRequest.Execute;
-      CheckError(FRestResponse.StatusCode <= 400, 'DeleteOnServer. REST Error');
+      CheckError((FRestResponse.StatusCode >= 200) and (FRestResponse.StatusCode <= 299), 'DeleteOnServer. REST Error');
       Result:= ExtractResult(FRestResponse.Content) = '1';
     finally
       JSONObject.Free;
@@ -553,24 +588,23 @@ begin
   except on
     E: Exception do begin
       ShowDebugMessage('TX2IrisQuery.DeleteOnServer. Exception:' + E.Message + #13#10 +
-       'StatusText: ' + FRestResponse.StatusText + #13#10 +
-       'StatusCode: ' + IntToStr(FRestResponse.StatusCode) + #13#10 +
-       FRestResponse.Content, 'Debug');
-      Abort;
+      'StatusText: ' + FRestResponse.StatusText + #13#10 +
+      'StatusCode: ' + IntToStr(FRestResponse.StatusCode) + #13#10 +
+      FRestResponse.Content, 'Debug');
+      raise;
     end;
   end;
 end;
 
 procedure TX2IrisQuery.GetList(ATableName: string; AFieldName: string; AOutList: TStrings);
-var
-  qry: TX2IrisQuery;
 begin
   CheckError(Assigned(FRestClient), 'RestClient is not assigned');
   CheckError(Assigned(AOutList), 'AOutList = nil');
   try
-    qry := TX2IrisQuery.Create(nil);
-    with qry do
+    with TX2IrisQuery.Create(nil) do
     try
+      RestClient := Self.RestClient;
+      Namespace := Self.Namespace;
       SQL.Text := Format('SELECT ID, %s FROM %s', [AFieldName, ATableName]);
       Active := True;
       while not Eof do begin
@@ -583,10 +617,10 @@ begin
   except
     on E: Exception do begin
       ShowDebugMessage('TX2IrisQuery.GetList. Exception: '+ E.Message + #13#10 +
-       'StatusText: ' + FRestResponse.StatusText + #13#10 +
-       'StatusCode: ' + IntToStr(FRestResponse.StatusCode) + #13#10 +
-       FRestResponse.Content, 'Debug');
-      Abort;
+      'StatusText: ' + FRestResponse.StatusText + #13#10 +
+      'StatusCode: ' + IntToStr(FRestResponse.StatusCode) + #13#10 +
+      FRestResponse.Content, 'Debug');
+      raise;
     end;
   end;
 end;
