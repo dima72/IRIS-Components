@@ -6,8 +6,6 @@
   Nov 2024.
 */
 
-Include X2AppErrors
-
 Class X2IrisClient.RESTServer Extends %CSP.REST
 {
 
@@ -48,7 +46,7 @@ ClassMethod ResolveDuplicateNames(cols As %DynamicArray)
 ClassMethod SortColumns(cols As %DynamicArray) As %Status
 {
 
-    $$$CheckError($iso(cols) = 1, "cols is nil")
+    if '($iso(cols) = 1) { throw ##class(%Exception.General).%New("cols is nil") }
     
     // Temporary arrays
     set fixed = ##class(%DynamicArray).%New()
@@ -136,16 +134,16 @@ ClassMethod ObjectExists(metaobjects As %Collection.ListOfObj, ColumnName As %St
 ClassMethod RunSQL() As %Status
 {
         
-    $$$CheckError($iso(%request.Content) = 1, "%request.Content is empty")   
+    if '($iso(%request.Content) = 1) { throw ##class(%Exception.General).%New("%request.Content is empty") }
     Set body = %request.Content.Read() 
       
     set input = {}.%FromJSON(body)     
-    $$$CheckError(input.%IsDefined("sql"), "sql is not Assigned")
-    $$$CheckError(input.%Get("sql") '= "", "sql is Empty")
+    if '(input.%IsDefined("sql")) { throw ##class(%Exception.General).%New("sql is not Assigned") }
+    if '(input.%Get("sql") '= "") { throw ##class(%Exception.General).%New("sql is Empty") }
 
-    $$$CheckError(input.%IsDefined("namespace"), "namespace is not Assigned")
-    $$$CheckError(input.%Get("namespace") '= "", "namespace is Empty")
-    $$$CheckError(##class(%SYS.Namespace).Exists(input.namespace) = 1, "namespace "_input.namespace_" does not exists")
+    if '(input.%IsDefined("namespace")) { throw ##class(%Exception.General).%New("namespace is not Assigned") }
+    if '(input.%Get("namespace") '= "") { throw ##class(%Exception.General).%New("namespace is Empty") }
+    if '(##class(%SYS.Namespace).Exists(input.namespace) = 1) { throw ##class(%Exception.General).%New("namespace "_input.namespace_" does not exists") }
     Zn input.namespace
 
     Set tSQL = input.sql
@@ -301,13 +299,13 @@ ClassMethod RunSQL() As %Status
       // BLOB / STREAM      
       elseif IrisType = "%Stream.GlobalBinary" {
           set col.DataType = "Blob"
-          $$$CheckError(i '= 0, "Blob column cannot be first column")
+          if '(i '= 0) { throw ##class(%Exception.General).%New("Blob column cannot be first column") }
       }
       // CLOB
       elseif IrisType = "%Stream.GlobalCharacter" {
           set col.DataType = "WideMemo"
           //Do not declare col.Size  - TWideMemoField will be Empty  
-          $$$CheckError(i '= 0, "WideMemo column cannot be first column")
+          if '(i '= 0) { throw ##class(%Exception.General).%New("WideMemo column cannot be first column") }
       }
         
      
@@ -484,18 +482,18 @@ Set colValue =  $REPLACE(text, """", """""")
 
 ClassMethod RunClassMethod() As %Status
 {
-    $$$CheckError($iso(%request.Content) = 1, "%request.Content is empty")   
+    if '($iso(%request.Content) = 1) { throw ##class(%Exception.General).%New("%request.Content is empty") }
     Set body = %request.Content.Read() 
       
     set input = {}.%FromJSON(body)     
-    $$$CheckError(input.%IsDefined("class"), "class is not Assigned")
-    $$$CheckError(input.%Get("class") '= "", "class is Empty")
+    if '(input.%IsDefined("class")) { throw ##class(%Exception.General).%New("class is not Assigned") }
+    if '(input.%Get("class") '= "") { throw ##class(%Exception.General).%New("class is Empty") }
     If $Extract(input.class,1,1)="%" { 
         Quit $$$ERROR($$$AccessDenied) 
     }
     
-    $$$CheckError(input.%IsDefined("method"), "method is not Assigned")
-    $$$CheckError(input.%Get("method") '= "", "method is Empty")
+    if '(input.%IsDefined("method")) { throw ##class(%Exception.General).%New("method is not Assigned") }
+    if '(input.%Get("method") '= "") { throw ##class(%Exception.General).%New("method is Empty") }
 
     //$$$CheckError(input.%IsDefined("namespace"), "namespace is not Assigned")
     //$$$CheckError(input.%Get("namespace") '= "", "namespace is Empty")
@@ -635,7 +633,7 @@ ClassMethod IsReferenceProperty(class As %String, propName As %String) As %Boole
 ClassMethod GetCompiledProperty(className As %String, propName As %String) As %Dictionary.CompiledProperty
 {
     Set class = ##class(%Dictionary.CompiledClass).%OpenId(className)
-    $$$CheckError(class '= "", "Class "_className_" not found in %Dictionary")
+    if '(class '= "") { throw ##class(%Exception.General).%New("Class "_className_" not found in %Dictionary") }
     If class = "" Quit ""
 
     For i=1:1:class.Properties.Count() {
@@ -651,23 +649,23 @@ ClassMethod PostObject() As %Status
     Set response = {}
     Try{
         
-        $$$CheckError($iso(%request.Content) = 1, "%request.Content is empty")   
+        if '($iso(%request.Content) = 1) { throw ##class(%Exception.General).%New("%request.Content is empty") }
         Set body = %request.Content.Read()
         Set input = {}.%FromJSON(body)
         
         //Set input = {"class":"ONAPI.Person","operation":"edit","data":{"ID":"1","Name":"Eastman,Lola I.ww","DOB":"11\/23\/1960"}}
         Set className = input.class
-        $$$CheckError(className '= "", "class is empty")
+        if '(className '= "") { throw ##class(%Exception.General).%New("class is empty") }
 
         If $Extract(className,1,1)="%" { 
           return $$$ERROR($$$AccessDenied) 
         }
 
         Set operation = input.operation
-        $$$CheckError((operation = "insert") || (operation = "edit") , "Invalid operation: "_operation_" (must be 'insert' or 'update'")
+        if '((operation = "insert") || (operation = "edit")) { throw ##class(%Exception.General).%New("Invalid operation: "_operation_" (must be 'insert' or 'update'") }
         
         Set data = input.data    
-        $$$CheckError($iso(data)=1, "data is nil")
+        if '($iso(data)=1) { throw ##class(%Exception.General).%New("data is nil") }
         // Extract ID
         Set id = data.ID
 
@@ -679,7 +677,7 @@ ClassMethod PostObject() As %Status
         ElseIf operation="edit" {
             // UPDATE
             Set obj = $classmethod(className, "%OpenId", id)
-            $$$CheckError($IsObject(obj), "Object with ID "_id_" not found")
+            if '($IsObject(obj)) { throw ##class(%Exception.General).%New("Object with ID "_id_" not found") }
         }
         
         // Apply properties
@@ -688,7 +686,7 @@ ClassMethod PostObject() As %Status
             Continue:key="ID"  // skip ID
                                     
             Set prop = ..GetCompiledProperty(className, key)
-            $$$CheckError(prop '= "", "Property "_key_" not found")
+            if '(prop '= "") { throw ##class(%Exception.General).%New("Property "_key_" not found") }
                         
             If (prop.Type '= "") && ($Extract(prop.Type,1) '= "%") {
                 // Get the declared type of the property                
@@ -738,13 +736,13 @@ ClassMethod DeleteObject() As %Status
 {
     Try {    
         // Validate request body
-        $$$CheckError($iso(%request.Content) = 1, "%request.Content is empty")
+        if '($iso(%request.Content) = 1) { throw ##class(%Exception.General).%New("%request.Content is empty") }
         Set body = %request.Content.Read()
         Set input = {}.%FromJSON(body)
 
         // Validate class name
         Set className = input.class
-        $$$CheckError(className '= "", "class is empty")
+        if '(className '= "") { throw ##class(%Exception.General).%New("class is empty") }
         If $Extract(className,1,1)="%" { 
           return $$$ERROR($$$AccessDenied) 
         }
@@ -752,11 +750,11 @@ ClassMethod DeleteObject() As %Status
 
         // Validate operation
         Set operation = input.operation
-        $$$CheckError(operation = "delete", "operation is not 'delete'")
+        if '(operation = "delete") { throw ##class(%Exception.General).%New("operation is not 'delete'") }
 
         // Validate ID
         Set ID = input.ID
-        $$$CheckError(ID '= "", "ID is empty")
+        if '(ID '= "") { throw ##class(%Exception.General).%New("ID is empty") }
         
         // Prepare JSON response object
         Set response = {}

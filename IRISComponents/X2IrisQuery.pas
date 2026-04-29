@@ -12,7 +12,7 @@ uses
   System.SysUtils, System.Classes, System.Generics.Collections, Data.DB,
   FireDAC.Comp.DataSet, FireDAC.Comp.Client, REST.Types, REST.Client,
   REST.Response.Adapter, System.JSON, FireDAC.Stan.Intf, FireDAC.Stan.StorageJSON,
-  FireDAC.Stan.Param;
+  FireDAC.Stan.Param, System.RegularExpressions;
 
 type
   [ComponentPlatformsAttribute(pidWin32 or pidWin64 or pidLinux64)] //  [ComponentPlatformsAttribute(pidAllPlatforms)]
@@ -43,6 +43,8 @@ type
     function RecordToJson(AChangedValues: Boolean): TJSONObject;
     function PostObjectAndGetID(AOperation: TDataSetState): string;
     function DeleteOnServer(AID: string): Boolean;
+    function ApplyParamsToSQL(ASQL: string): string;
+    procedure CreateParametersFromSQL(ASQL: string);
   protected
     procedure DoDefineDatSManager; override;
     procedure DoBeforePost; override;
@@ -67,6 +69,7 @@ type
     property Active: Boolean read FDatasetOpened write SetActive2;
     property SQL: TStrings read FSQL write SetSQL;
     property Namespace: string read FNamespace write FNamespace;
+    property Parameters: TFDParams read GetParams;
     property OnHTTPProtocolError: TCustomRESTRequestNotifyEvent read FOnHTTPProtocolError write FOnHTTPProtocolError;
     property OnBeforeOpen: TDataSetNotifyEvent read FOnBeforeOpen write FOnBeforeOpen;
   end;
@@ -177,6 +180,120 @@ begin
   Result := FParams;
 end;
 
+function TX2IrisQuery.ApplyParamsToSQL(ASQL: string): string;
+var
+  i: Integer;
+  Param: TFDParam;
+  ParamName: string;
+  ParamValue: string;
+  ParamPos: Integer;
+  IsInsideQuotes: Boolean;
+  j: Integer;
+  QuoteCount: Integer;
+begin
+  Result := ASQL;
+
+  if FParams.Count = 0 then
+    Exit;
+
+  for i := 0 to FParams.Count - 1 do begin
+    Param := FParams[i];
+    ParamName := ':' + Param.Name;
+
+    // Convert parameter value to string based on its data type
+    case Param.DataType of
+      ftString, ftWideString, ftMemo, ftWideMemo:
+        ParamValue := Param.AsString;
+      ftInteger, ftSmallint, ftWord, ftLargeint:
+        ParamValue := IntToStr(Param.AsInteger);
+      ftFloat, ftCurrency, ftBCD:
+        ParamValue := FloatToStr(Param.AsFloat);
+      ftBoolean:
+        if Param.AsBoolean then
+          ParamValue := '1'
+        else
+          ParamValue := '0';
+      ftDateTime, ftDate, ftTime:
+        ParamValue := FormatDateTime('yyyy-mm-dd hh:nn:ss', Param.AsDateTime);
+    else
+      ParamValue := Param.AsString;
+    end;
+
+    // Find and replace all occurrences
+    ParamPos := Pos(ParamName, Result);
+    while ParamPos > 0 do
+    begin
+      IsInsideQuotes := False;
+
+      // Count quotes before this parameter to determine if we're inside a quoted string
+      QuoteCount := 0;
+      for j := 1 to ParamPos - 1 do
+      begin
+        if Result[j] = '''' then
+          Inc(QuoteCount);
+      end;
+
+      // If odd number of quotes before, we're inside a quoted string
+      IsInsideQuotes := (QuoteCount mod 2) = 1;
+
+      // Build the replacement value with quotes only if not inside quotes
+      if not IsInsideQuotes and (Param.DataType in [ftString, ftWideString, ftMemo, ftWideMemo]) then
+        ParamValue := QuotedStr(ParamValue);
+
+      // Replace this occurrence
+      Result := Copy(Result, 1, ParamPos - 1) + ParamValue +
+                Copy(Result, ParamPos + Length(ParamName), MaxInt);
+
+      // Reset ParamValue for next iteration (in case it was quoted)
+      case Param.DataType of
+        ftString, ftWideString, ftMemo, ftWideMemo:
+          ParamValue := Param.AsString;
+        ftInteger, ftSmallint, ftWord, ftLargeint:
+          ParamValue := IntToStr(Param.AsInteger);
+        ftFloat, ftCurrency, ftBCD:
+          ParamValue := FloatToStr(Param.AsFloat);
+        ftBoolean:
+          if Param.AsBoolean then
+            ParamValue := '1'
+          else
+            ParamValue := '0';
+        ftDateTime, ftDate, ftTime:
+          ParamValue := FormatDateTime('yyyy-mm-dd hh:nn:ss', Param.AsDateTime);
+      else
+        ParamValue := Param.AsString;
+      end;
+
+      // Find next occurrence
+      ParamPos := Pos(ParamName, Result);
+    end;
+  end;
+end;
+
+procedure TX2IrisQuery.CreateParametersFromSQL(ASQL: string);
+var
+  RegEx: TRegEx;
+  Matches: TMatchCollection;
+  Match: TMatch;
+  ParamName: string;
+  i: Integer;
+begin
+  // Find all parameters in the format :ParamName
+  RegEx := TRegEx.Create(':(\w+)', [roIgnoreCase, roMultiLine]);
+  Matches := RegEx.Matches(ASQL);
+
+  // Create parameters that don't already exist
+  for Match in Matches do begin
+    // Extract parameter name without the colon
+    ParamName := Match.Groups[1].Value;
+
+    // Check if parameter already exists
+    if FParams.FindParam(ParamName) = nil then begin
+      // Create new parameter with default string type
+      FParams.Add(ParamName, ftString);
+    end;
+  end;
+end;
+
 constructor TX2IrisQuery.Create(AOwner: TComponent);
 begin
   inherited;
@@ -220,9 +337,11 @@ end;
 
 procedure TX2IrisQuery.SQLChanged(Sender: TObject);
 begin
+  // Auto-detect and create parameters from SQL
+  CreateParametersFromSQL(FSQL.Text);
   // automatically refresh dataset when SQL changes
- if FDatasetOpened then
-   Open;
+  if FDatasetOpened then
+    Open;
 end;
 
 procedure TX2IrisQuery.SetActive2(AValue: Boolean);
@@ -282,7 +401,7 @@ begin
   try
     JSONObject := TJSONObject.Create;
     try
-      JSONObject.AddPair('sql', Trim(FSQL.Text));
+      JSONObject.AddPair('sql', Trim(ApplyParamsToSQL(FSQL.Text)));
       JSONObject.AddPair('namespace', Trim(FNamespace));
       FRestRequest.ClearBody;
       FRestRequest.AddBody(JSONObject.ToJSON, ctAPPLICATION_JSON);
@@ -293,15 +412,34 @@ begin
       //debug only
       //SS.SaveToFile('responce.json');
       SS.Position := 0;
+      ReadOnly := False;
       LoadFromStream(SS, sfJSON);
       var IdField := FindField('ID');
       if Assigned(IdField) then
         IdField.ReadOnly := True;
       var ClassField := FindField('__class');
       if Assigned(ClassField) then begin
-        FIrisClass := ClassField.AsString;
+        ClassField.ReadOnly := True;
         ClassField.DisplayWidth := 50;
-      end;
+        FIrisClass := ClassField.AsString;
+        DisableControls;
+        try
+          First;
+          while not Eof do begin
+            if FieldByName('__class').AsString <> FIrisClass then begin
+              FIrisClass := '';
+              ReadOnly := True;
+              break;
+            end;
+            Next;
+          end;
+          First;
+        finally
+          EnableControls;
+        end;
+      end
+      else
+        ReadOnly := True;
       FieldDefs.Update;
       FDatasetOpened := True;
     finally
